@@ -5,30 +5,23 @@
  */
 
 package DataAccessObject;
+
 /**
- *
  * @author dell
  */
-public class Singelton extends IBackend_DAO_List_impl{
-    
-   private static Singelton mySingelton = null;
-   
-   protected Singelton() throws Exception{
-      // Exists only to defeat instantiation.
-   }
+// this singelton inherit the controller ONLY ONCE (static)
+public class Singelton extends Controller{
+    private static Singelton mySingelton = null;
 
-    /**
-     *
-     * @return
-     * @throws java.lang.Exception
+    protected Singelton() throws Exception{
+       // Exists only to defeat instantiation.
+    }
 
-     */
+    // cgeck if the singelton already exist
     public static Singelton getMySingelton() throws Exception{
-      if(mySingelton == null) {
-         mySingelton = new Singelton();
-      }
-      return mySingelton;
-   }
-    
+       if(mySingelton == null) {
+          mySingelton = new Singelton();
+       }
+       return mySingelton;
+    }
 }
-

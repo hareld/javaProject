@@ -5,55 +5,49 @@
  */
 
 package Interface;
-
-import MyPackages.Claim;
-import MyPackages.Person;
-import MyPackages.Claim.ClaimStat;
-import MyPackages.Claim.EvntType;
-import MyPackages.Policy;
-import MyPackages.Policy.PlicyType;
-import MyPackages.CustomerCrd;
 import java.util.ArrayList;
+import Packages.Activity;
+import Packages.Claim;
+import Packages.Claim.ClaimStat;
+import Packages.Claim.EvntType;
+import Packages.CustomerCrd;
+import Packages.Person;
+import Packages.Policy;
+import Packages.Policy.PlicyType;
+
 
 /**
- *
  * @author dell
  */
+
+// interface
 public interface IBackend {
 
-    boolean AddNewCustomerCrd(CustomerCrd c) throws Exception; //dagan
-    boolean AddNewPolicy(Policy po,Person per) throws Exception; //dagan
+    Long AddNewPolicy(Policy po,Person per) throws Exception;
+    Long AddNewClaim(Claim cl,Person per) throws Exception;
 
-    
-    /**
-     *
-     * @param cl
-     * @param per
-     * @throws Exception
-     */
-    void AddNewClaim(Claim cl,Person per) throws Exception;
-    void DeleteCustomerCrd(CustomerCrd c) throws Exception;
+    boolean AddNewCustomerCrd(CustomerCrd c) throws Exception;
     boolean DeletePolicy(Policy po,Person per) throws Exception;
     boolean DeleteClaim(Claim cl,Person per) throws Exception;
+    
+    void DeleteCustomerCrd(CustomerCrd c) throws Exception;
+    void UpdatePerson(Person per) throws Exception;
+    void UpdateActivity(Activity activity) throws Exception;
     void UpdateCustomerCrd(CustomerCrd c) throws Exception;
     void UpdatePolicy(Policy po,Person per) throws Exception;
     void UpdateClaim(Claim cl,Person per) throws Exception;
+    
     ArrayList<Claim> GetAllOpenClaims() throws Exception;
     ArrayList<CustomerCrd> GetAllCustemers() throws Exception;
     ArrayList<Policy> GetAllPolicies() throws Exception;
     ArrayList<Policy> GetPerPolicies(Person per) throws Exception;
-    /**
-     *
-     * @return
-     * @throws Exception
-     */
     ArrayList<Claim> GetAllClaims() throws Exception;
     ArrayList<Claim> GetPerClaims(Person per) throws Exception;
     ArrayList<Claim> GetMyEventClaims(EvntType et,Person per) throws Exception;
     ArrayList<Claim> GetMyStatusClaims(ClaimStat cs,Person per) throws Exception;
     ArrayList<Policy> GetMyTypePolicies(PlicyType cs,Person per) throws Exception;
     
-    CustomerCrd GetMyPersonCstmrCrd(long perId) throws Exception; //dagan
-    Policy GetPolicyById(long polcyId) throws Exception; //dagan
-    Claim GetClaimById(long claimId) throws Exception; //dagan
+    CustomerCrd GetMyPersonCstmrCrd(long perId) throws Exception;
+    Policy GetPolicyById(long polcyId) throws Exception;
+    Claim GetClaimById(long claimId) throws Exception;
 }
