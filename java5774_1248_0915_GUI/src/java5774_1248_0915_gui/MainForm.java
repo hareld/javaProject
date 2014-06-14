@@ -5,12 +5,8 @@
  */
 package java5774_1248_0915_gui;
 
-import MyPackages.Activity;
-import MyPackages.Claim;
-import MyPackages.Person;
-import DataAccessObject.IBackend_DAO_List_impl;
+import DataAccessObject.Controller;
 import DataAccessObject.Singelton;
-import MyPackages.CustomerCrd;
 import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -18,15 +14,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import Packages.Activity;
+import Packages.Claim;
+import Packages.CustomerCrd;
+import Packages.Person;
 
 /**
- *
  * @author dell
  */
 public class MainForm extends javax.swing.JFrame {
 
     private static final long serialVersionUID = 1L;
-    private static IBackend_DAO_List_impl sngltn = null;
+    private static Controller sngltn = null;
 
     static {
         try {
@@ -36,18 +35,24 @@ public class MainForm extends javax.swing.JFrame {
         }
     }
 
-    ;
-    /**
-     * Creates new form MainForm
-     */
+    // Ctor
     public MainForm() throws Exception {
         initComponents();
 
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
         LockOrUnlockButtons();
+        AllRelevantDeleteCstmrCrdPersonsID();
+        if (buttonUpdateCstmrCrd.isEnabled()) {
+            ArrayList<Long> AllPersonsID = new ArrayList<Long>();
+            for (CustomerCrd CstmrCrd : sngltn.GetAllCustemers()) {
+                AllPersonsID.add(Long.valueOf(CstmrCrd.getPerson().getId()));
+            }
+            jComboBoxSeclectPerId1.setModel(new DefaultComboBoxModel(AllPersonsID.toArray()));
+        }
     }
 
+    // alignment the window
     private void formWindowOpened(java.awt.event.WindowEvent evt) {
         int lebar = this.getWidth() / 2;
         int tinggi = this.getHeight() / 2;
@@ -64,6 +69,7 @@ public class MainForm extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         buttonAddNewCstmrCrd = new java.awt.Button();
         buttonExist = new java.awt.Button();
@@ -76,6 +82,7 @@ public class MainForm extends javax.swing.JFrame {
         buttonDeleteCstmrCrd = new java.awt.Button();
         labelSeclectPerId2 = new javax.swing.JLabel();
         jComboBoxSeclectPerId2 = new javax.swing.JComboBox();
+        buttonCleanAllData = new java.awt.Button();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setResizable(false);
@@ -177,7 +184,22 @@ public class MainForm extends javax.swing.JFrame {
                 jComboBoxSeclectPerId2ActionPerformed(evt);
             }
         });
-        jLayeredDeleteCstmrCrd.add(jComboBoxSeclectPerId2, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 40, 80, 30));
+        jLayeredDeleteCstmrCrd.add(jComboBoxSeclectPerId2, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 40, 130, 30));
+
+        buttonCleanAllData.setBackground(new java.awt.Color(255, 0, 0));
+        buttonCleanAllData.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        buttonCleanAllData.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        buttonCleanAllData.setForeground(new java.awt.Color(255, 255, 255));
+        buttonCleanAllData.setLabel("Delete all exsit data");
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, buttonCleanAllData, org.jdesktop.beansbinding.ELProperty.create("${background}"), buttonCleanAllData, org.jdesktop.beansbinding.BeanProperty.create("background"));
+        bindingGroup.addBinding(binding);
+
+        buttonCleanAllData.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonCleanAllDataActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -193,9 +215,10 @@ public class MainForm extends javax.swing.JFrame {
                             .addComponent(jLayeredDeleteCstmrCrd, javax.swing.GroupLayout.PREFERRED_SIZE, 222, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(10, 10, 10)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(buttonExist, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(buttonQueriesViewData, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(buttonExist, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                                    .addComponent(buttonQueriesViewData, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                                    .addComponent(buttonCleanAllData, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(55, 55, 55)
                         .addComponent(buttonAddNewCstmrCrd, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -214,19 +237,24 @@ public class MainForm extends javax.swing.JFrame {
                 .addComponent(buttonQueriesViewData, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(23, 23, 23)
                 .addComponent(buttonExist, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addGap(24, 24, 24)
+                .addComponent(buttonCleanAllData, javax.swing.GroupLayout.PREFERRED_SIZE, 59, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(30, Short.MAX_VALUE))
         );
 
         buttonQueriesViewData.getAccessibleContext().setAccessibleName("");
 
+        bindingGroup.bind();
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // handle exiting from system click
     private void buttonExistActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonExistActionPerformed
         try {
             if (!(sngltn.GetAllCustemers().isEmpty())) {
-                int code = JOptionPane.showConfirmDialog(null, "Note: All the information you just typed is going to lose. \n"
-                        + "Do you really want to exit the program?", "", JOptionPane.YES_NO_OPTION);
+                int code = JOptionPane.showConfirmDialog(null, "Do you want to exit this program?\n"
+                        + "Relax, all the information you just typed will save in my data base. ", "", JOptionPane.YES_NO_OPTION);
                 if (code == JOptionPane.OK_OPTION) {
                     WindowEvent wev = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
                     Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
@@ -249,6 +277,7 @@ public class MainForm extends javax.swing.JFrame {
 
     }//GEN-LAST:event_buttonDeleteCstmrCrdActionPerformed
 
+    // handle the queries view click
     private void buttonQueriesViewDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonQueriesViewDataActionPerformed
         QueriesAndViewingDataForm QueriesViewData = null;
         try {
@@ -270,6 +299,7 @@ public class MainForm extends javax.swing.JFrame {
         QueriesViewData.show();
     }//GEN-LAST:event_buttonQueriesViewDataActionPerformed
 
+    // handle add new customer card click
     private void buttonAddNewCstmrCrdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddNewCstmrCrdActionPerformed
         AddCstmrCrdForm addCstmr = null;
         try {
@@ -291,6 +321,7 @@ public class MainForm extends javax.swing.JFrame {
         addCstmr.show();
     }//GEN-LAST:event_buttonAddNewCstmrCrdActionPerformed
 
+    // choose person id for update
     private void jComboBoxSeclectPerId1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSeclectPerId1ActionPerformed
         UpdateCstmrCrdForm UpdateCstmr = null;
         try {
@@ -327,6 +358,7 @@ public class MainForm extends javax.swing.JFrame {
 
     }//GEN-LAST:event_buttonUpdateCstmrCrdMouseExited
 
+    // handle mouse pressed (for update customer card)
     private void buttonUpdateCstmrCrdMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonUpdateCstmrCrdMousePressed
         if (buttonUpdateCstmrCrd.isEnabled()) {
             buttonUpdateCstmrCrd.setVisible(false);
@@ -339,6 +371,7 @@ public class MainForm extends javax.swing.JFrame {
 
     }//GEN-LAST:event_buttonUpdateCstmrCrdMouseReleased
 
+    // handle mouse exited (for update customer card)
     private void jLayeredUpdateCstmrCrdMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLayeredUpdateCstmrCrdMouseExited
         if (buttonUpdateCstmrCrd.isEnabled()) {
             buttonUpdateCstmrCrd.setVisible(true);
@@ -351,6 +384,7 @@ public class MainForm extends javax.swing.JFrame {
 
     }//GEN-LAST:event_jComboBoxSeclectPerId1ItemStateChanged
 
+    // handle mouse pressed (for delete customer card)
     private void buttonDeleteCstmrCrdMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonDeleteCstmrCrdMousePressed
         if (buttonDeleteCstmrCrd.isEnabled()) {
             buttonDeleteCstmrCrd.setVisible(false);
@@ -359,6 +393,7 @@ public class MainForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_buttonDeleteCstmrCrdMousePressed
 
+    // handle mouse exited (for update customer card)
     private void jLayeredDeleteCstmrCrdMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLayeredDeleteCstmrCrdMouseExited
         if (buttonDeleteCstmrCrd.isEnabled()) {
             buttonDeleteCstmrCrd.setVisible(true);
@@ -367,6 +402,7 @@ public class MainForm extends javax.swing.JFrame {
         jComboBoxSeclectPerId2.setVisible(false);
     }//GEN-LAST:event_jLayeredDeleteCstmrCrdMouseExited
 
+    // choose person id for delete
     private void jComboBoxSeclectPerId2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxSeclectPerId2ActionPerformed
         try {
             if (sngltn.GetPerPolicies(getPerByPerId(Long.valueOf(jComboBoxSeclectPerId2.getSelectedItem().toString()))).size() > 0) {
@@ -392,12 +428,43 @@ public class MainForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jComboBoxSeclectPerId2ActionPerformed
 
+    // handle clean all data click
+    private void buttonCleanAllDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonCleanAllDataActionPerformed
+        int code = JOptionPane.showConfirmDialog(null, "Notice: Dangerous operation! \n"
+                + "The system get a request to delete all the data. \n"
+                + "This will immediately delete any information you have entered so far in the system, and you can not restore it. \n"
+                + "Do you really want to do it?", "", JOptionPane.YES_NO_OPTION);
+        if (code == JOptionPane.OK_OPTION) {
+            try {
+                ArrayList<CustomerCrd> allCstmrCrd = sngltn.GetAllCustemers();
+                for (int i = 0; i < allCstmrCrd.size(); i++) {
+                    sngltn.DeleteCustomerCrd(allCstmrCrd.get(i));
+                }
+
+                JOptionPane.showConfirmDialog(null, "Delete all data Successfully", "", JOptionPane.PLAIN_MESSAGE);
+            } catch (Exception ex) {
+                Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        } else {
+        }
+        try {
+            if (sngltn.GetAllCustemers().isEmpty()) {
+                myfunc1();
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_buttonCleanAllDataActionPerformed
+
+    // called when closing windows
     private void myfunc1() throws Exception {
         LockOrUnlockButtons();
         AddAllPersonsID1();
         myfunc2();
     }
 
+    // called when closing windows
     private void myfunc2() throws Exception {
         EnableThisForm();
         if (AllRelevantDeleteCstmrCrdPersonsID()) {
@@ -407,57 +474,67 @@ public class MainForm extends javax.swing.JFrame {
         }
     }
 
+    // lock the window
     private void EnableThisForm() throws Exception {
         setEnabled(true);
     }
 
+    // enable or able buttons in window
     private void LockOrUnlockButtons() throws Exception {
         boolean status = !sngltn.GetAllCustemers().isEmpty();
+        buttonCleanAllData.setEnabled(status);
         buttonUpdateCstmrCrd.setEnabled(status);
         buttonDeleteCstmrCrd.setEnabled(status);
         buttonQueriesViewData.setEnabled(status);
     }
 
+    // add all person that can be updated into the combo box
     private void AddAllPersonsID1() throws Exception {
         ArrayList<Long> AllPersonsID = new ArrayList<Long>();
         for (CustomerCrd CstmrCrd : sngltn.GetAllCustemers()) {
-            AllPersonsID.add(Long.valueOf(CstmrCrd.getPer().getPerId()));
+            AllPersonsID.add(Long.valueOf(CstmrCrd.getPerson().getId()));
         }
         jComboBoxSeclectPerId1.setModel(new DefaultComboBoxModel(AllPersonsID.toArray()));
     }
 
+    // return all customer card that can be delete into the combo box
     private boolean AllRelevantDeleteCstmrCrdPersonsID() throws Exception {
         ArrayList<Long> RlvntDltCstmrCrdPrsnID = new ArrayList<Long>();
-        for (CustomerCrd cstmrCrd : sngltn.GetAllCustemers()) {
-            boolean stat = true;
-            for (Activity act : cstmrCrd.getPerActivities()) {
-                if (act instanceof Claim) {
-                    Claim cl = (Claim) act;
-                    if ("Treatment".equals(cl.getInsuranceClaimStatus().toString()) && "SeeInMoreDetails".equals(cl.getInsuranceClaimStatus().toString())) {
-                        stat = false;
-                    } else {
-                        stat = true;
-                        break;
+        if (sngltn.GetAllCustemers().isEmpty()) {
+            return false;
+        } else {
+            for (CustomerCrd cstmrCrd : sngltn.GetAllCustemers()) {
+                boolean stat = true;
+                for (Activity act : cstmrCrd.getActivities()) {
+                    if (act instanceof Claim) {
+                        Claim cl = (Claim) act;
+                        if ("Treatment".equals(cl.getInsuranceClaimStatus().toString()) && "SeeInMoreDetails".equals(cl.getInsuranceClaimStatus().toString())) {
+                            stat = false;
+                        } else {
+                            stat = true;
+                            break;
+                        }
                     }
                 }
+                if (stat) {
+                    RlvntDltCstmrCrdPrsnID.add(Long.valueOf(cstmrCrd.getPerson().getId()));
+                }
             }
-            if (stat) {
-                RlvntDltCstmrCrdPrsnID.add(Long.valueOf(cstmrCrd.getPer().getPerId()));
-            }
-        }
 
-        if (RlvntDltCstmrCrdPrsnID.size() > 0) {
-            jComboBoxSeclectPerId2.setModel(new DefaultComboBoxModel(RlvntDltCstmrCrdPrsnID.toArray()));
-            return true;
-        } else {
-            return false;
+            if (RlvntDltCstmrCrdPrsnID.size() > 0) {
+                jComboBoxSeclectPerId2.setModel(new DefaultComboBoxModel(RlvntDltCstmrCrdPrsnID.toArray()));
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
+    // return person details object by person id
     private Person getPerByPerId(long personId) throws Exception {
         for (CustomerCrd cstmr : sngltn.GetAllCustemers()) {
-            if (cstmr.getPer().getPerId() == personId) {
-                return cstmr.getPer();
+            if (cstmr.getPerson().getId() == personId) {
+                return cstmr.getPerson();
             }
         }
         return null;
@@ -506,6 +583,7 @@ public class MainForm extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private java.awt.Button buttonAddNewCstmrCrd;
+    private java.awt.Button buttonCleanAllData;
     private java.awt.Button buttonDeleteCstmrCrd;
     private java.awt.Button buttonExist;
     private java.awt.Button buttonQueriesViewData;
@@ -516,5 +594,6 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JLayeredPane jLayeredUpdateCstmrCrd;
     private javax.swing.JLabel labelSeclectPerId1;
     private javax.swing.JLabel labelSeclectPerId2;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

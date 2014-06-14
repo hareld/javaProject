@@ -5,27 +5,26 @@
  */
 package java5774_1248_0915_gui;
 
-import MyPackages.Claim;
-import MyPackages.Policy;
-import DataAccessObject.IBackend_DAO_List_impl;
+import DataAccessObject.Controller;
 import DataAccessObject.Singelton;
-import MyPackages.CustomerCrd;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
+import Packages.Claim;
+import Packages.CustomerCrd;
+import Packages.Policy;
 
 /**
- *
  * @author dell
  */
 public class QueriesAndViewingDataForm extends javax.swing.JFrame {
 
     private static final long serialVersionUID = 1L;
     private final Runnable enableMainFormMyFunc;
-    private static IBackend_DAO_List_impl sngltn = null;
+    private static Controller sngltn = null;
 
     static {
         try {
@@ -35,8 +34,7 @@ public class QueriesAndViewingDataForm extends javax.swing.JFrame {
         }
     }
 
-    ;
- 
+    // Ctor
     public QueriesAndViewingDataForm(Runnable myfunc) throws Exception {
         enableMainFormMyFunc = myfunc;
         initComponents();
@@ -45,16 +43,17 @@ public class QueriesAndViewingDataForm extends javax.swing.JFrame {
 
         ArrayList<Long> AllPersonsID = new ArrayList<Long>();
         for (CustomerCrd CstmrCrd : sngltn.GetAllCustemers()) {
-            AllPersonsID.add(Long.valueOf(CstmrCrd.getPer().getPerId()));
+            AllPersonsID.add(Long.valueOf(CstmrCrd.getPerson().getId()));
         }
-        
+
         jComboBoxSelectPersonID.setModel(new DefaultComboBoxModel(AllPersonsID.toArray()));
         jComboBoxPolicyType.setModel(new DefaultComboBoxModel(Policy.PlicyType.values()));
-        
+
         jComboBoxClaimStatus.setModel(new DefaultComboBoxModel(Claim.ClaimStat.values()));
         jComboBoxClaimEventType.setModel(new DefaultComboBoxModel(Claim.EvntType.values()));
     }
 
+    // aligment the window
     private void formWindowOpened(java.awt.event.WindowEvent evt) {
         int lebar = this.getWidth() / 2;
         int tinggi = this.getHeight() / 2;
@@ -180,21 +179,18 @@ public class QueriesAndViewingDataForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // handle click for all exists claims
     private void jButtonViewAllClaimsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewAllClaimsActionPerformed
-        try 
-        {
-            if (sngltn.GetAllClaims().isEmpty())
+        try {
+            if (sngltn.GetAllClaims().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "No information to display. \n"
                         + "Until this moment there is'nt any claim Activity in your database.", "", JOptionPane.PLAIN_MESSAGE);
-            else
-            {
-                ClaimsTableViewForm ViewClaimsTable=null;
-                ViewClaimsTable =new ClaimsTableViewForm(jButtonViewAllClaims.getText());
+            } else {
+                ClaimsTableViewForm ViewClaimsTable = null;
+                ViewClaimsTable = new ClaimsTableViewForm(jButtonViewAllClaims.getText());
                 ViewClaimsTable.show();
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButtonViewAllClaimsActionPerformed
@@ -203,167 +199,148 @@ public class QueriesAndViewingDataForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jComboBoxPolicyTypeActionPerformed
 
+    // handle click for all exists policies
     private void jButtonViewAllPoliciesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewAllPoliciesActionPerformed
-        try 
-        {
-            if (sngltn.GetAllPolicies().isEmpty())
+        try {
+            if (sngltn.GetAllPolicies().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "No information to display. \n"
                         + "Until this moment there is'nt any policy Activity in your database.", "", JOptionPane.PLAIN_MESSAGE);
-            else 
-            {
+            } else {
                 PoliciesTableViewForm ViewPoliciesTable = null;
                 ViewPoliciesTable = new PoliciesTableViewForm(jButtonViewAllPolicies.getText());
                 ViewPoliciesTable.show();
             }
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButtonViewAllPoliciesActionPerformed
 
+    // handle click for all exists claims with specific event type
     private void jButtonViewAllClaimWithThisEventTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewAllClaimWithThisEventTypeActionPerformed
         ClaimsTableViewForm viewClaimsTable = null;
         boolean check = false;
         try {
             for (CustomerCrd ctmrCrd : sngltn.GetAllCustemers()) {
-                if ((sngltn.GetMyEventClaims((Claim.EvntType) jComboBoxClaimEventType.getSelectedItem(), ctmrCrd.getPer()).isEmpty()) == false) {
+                if ((sngltn.GetMyEventClaims((Claim.EvntType) jComboBoxClaimEventType.getSelectedItem(), ctmrCrd.getPerson()).isEmpty()) == false) {
                     check = true;
                     break;
                 }
             }
-        } 
-        catch (Exception ex) 
-        {
+        } catch (Exception ex) {
             Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        if (!check) 
-        {
+        if (!check) {
             JOptionPane.showMessageDialog(null, "No information to display. \n"
-                    + "Until this moment there is'nt Claim with this ("+jComboBoxClaimEventType.getSelectedItem().toString() + ") ClaimEventType in your database.", "", JOptionPane.PLAIN_MESSAGE);
-        } 
-        else 
-        {
-            try 
-            {
+                    + "Until this moment there is'nt Claim with this (" + jComboBoxClaimEventType.getSelectedItem().toString() + ") ClaimEventType in your database.", "", JOptionPane.PLAIN_MESSAGE);
+        } else {
+            try {
                 viewClaimsTable = new ClaimsTableViewForm(jButtonViewAllClaimWithThisEventType.getText(), (Claim.EvntType) jComboBoxClaimEventType.getSelectedItem());
-            } 
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
             }
             viewClaimsTable.show();
-        }                                                                     
+        }
     }//GEN-LAST:event_jButtonViewAllClaimWithThisEventTypeActionPerformed
 
+    // closing the window
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         enableMainFormMyFunc.run();
     }//GEN-LAST:event_formWindowClosing
 
+    // handle click for view customer card of a person
     private void jButtonViewThisPersonCstmrCrdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewThisPersonCstmrCrdActionPerformed
         JustViewCstmrCrdForm JustViewCstmrCrd = null;
-        try 
-        {
+        try {
             JustViewCstmrCrd = new JustViewCstmrCrdForm(Long.valueOf(jComboBoxSelectPersonID.getSelectedItem().toString()));
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
         }
         JustViewCstmrCrd.show();
 
     }//GEN-LAST:event_jButtonViewThisPersonCstmrCrdActionPerformed
 
+    // handle click for all exists policies with specific policy type
     private void jButtonViewAllPoliciesWithThisPolicyTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewAllPoliciesWithThisPolicyTypeActionPerformed
         PoliciesTableViewForm ViewPoliciesTable = null;
         boolean check = false;
         try {
             for (CustomerCrd ctmrCrd : sngltn.GetAllCustemers()) {
-                if ((sngltn.GetMyTypePolicies((Policy.PlicyType) jComboBoxPolicyType.getSelectedItem(), ctmrCrd.getPer()).isEmpty()) == false) {
+                if ((sngltn.GetMyTypePolicies((Policy.PlicyType) jComboBoxPolicyType.getSelectedItem(), ctmrCrd.getPerson()).isEmpty()) == false) {
                     check = true;
                     break;
                 }
             }
-        } 
-        catch (Exception ex) 
-        {
+        } catch (Exception ex) {
             Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        if (!check) 
-        {
+        if (!check) {
             JOptionPane.showMessageDialog(null, "No information to display. \n"
-                    + "Until this moment there is'nt policy with this ("+jComboBoxPolicyType.getSelectedItem().toString() + ") PolicyType in your database.", "", JOptionPane.PLAIN_MESSAGE);
-        } 
-        else 
-        {
-            try 
-            {
+                    + "Until this moment there is'nt policy with this (" + jComboBoxPolicyType.getSelectedItem().toString() + ") PolicyType in your database.", "", JOptionPane.PLAIN_MESSAGE);
+        } else {
+            try {
                 ViewPoliciesTable = new PoliciesTableViewForm(jButtonViewAllPoliciesWithThisPolicyType.getText(), (Policy.PlicyType) jComboBoxPolicyType.getSelectedItem());
-            } 
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
             }
             ViewPoliciesTable.show();
         }
-    
+
     }//GEN-LAST:event_jButtonViewAllPoliciesWithThisPolicyTypeActionPerformed
 
+    // handle click for view all claims that still open
     private void jButtonViewAllOpenClaimsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewAllOpenClaimsActionPerformed
-        ClaimsTableViewForm viewClaimsTable= null;
-        if (sngltn.GetAllOpenClaims().isEmpty())
-             JOptionPane.showMessageDialog(null, "No information to display. \n"
-                    + "As of this moment,all the claims are closed! (Confirmed or Deferred)", "", JOptionPane.PLAIN_MESSAGE);
-        else
-        {
-            try 
-            {
-                viewClaimsTable = new ClaimsTableViewForm(jButtonViewAllOpenClaims.getText());
-                viewClaimsTable.show();
+        ClaimsTableViewForm viewClaimsTable = null;
+        try {
+            if (sngltn.GetAllOpenClaims().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No information to display. \n"
+                        + "As of this moment,all the claims are closed! (Confirmed or Deferred)", "", JOptionPane.PLAIN_MESSAGE);
+            } else {
+                try {
+                    viewClaimsTable = new ClaimsTableViewForm(jButtonViewAllOpenClaims.getText());
+                    viewClaimsTable.show();
+                } catch (Exception ex) {
+                    Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
-            catch (Exception ex) 
-            {
-                Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        } catch (Exception ex) {
+            Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButtonViewAllOpenClaimsActionPerformed
 
+    // handle click for all exists claims with specific status
     private void jButtonViewAllClaimWithThisStautsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonViewAllClaimWithThisStautsActionPerformed
         ClaimsTableViewForm viewClaimsTable = null;
         boolean check = false;
         try {
             for (CustomerCrd ctmrCrd : sngltn.GetAllCustemers()) {
-                if ((sngltn.GetMyStatusClaims((Claim.ClaimStat) jComboBoxClaimStatus.getSelectedItem(), ctmrCrd.getPer()).isEmpty()) == false) {
+                if ((sngltn.GetMyStatusClaims((Claim.ClaimStat) jComboBoxClaimStatus.getSelectedItem(), ctmrCrd.getPerson()).isEmpty()) == false) {
                     check = true;
                     break;
                 }
             }
-        } 
-        catch (Exception ex) 
-        {
+        } catch (Exception ex) {
             Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        if (!check) 
-        {
+        if (!check) {
             JOptionPane.showMessageDialog(null, "No information to display. \n"
-                    + "Until this moment there is'nt Claim with this ("+jComboBoxClaimStatus.getSelectedItem().toString() + ") ClaimStatus in your database.", "", JOptionPane.PLAIN_MESSAGE);
-        } 
-        else 
-        {
-            try 
-            {
+                    + "Until this moment there is'nt Claim with this (" + jComboBoxClaimStatus.getSelectedItem().toString() + ") ClaimStatus in your database.", "", JOptionPane.PLAIN_MESSAGE);
+        } else {
+            try {
                 viewClaimsTable = new ClaimsTableViewForm(jButtonViewAllClaimWithThisStauts.getText(), (Claim.ClaimStat) jComboBoxClaimStatus.getSelectedItem());
-            } 
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
             }
             viewClaimsTable.show();
         }
     }//GEN-LAST:event_jButtonViewAllClaimWithThisStautsActionPerformed
 
-/**
- * @param args the command line arguments
- */
-public static void main(String args[]) {
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -374,45 +351,30 @@ public static void main(String args[]) {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
-                
 
-}
+                }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(QueriesAndViewingDataForm.class  
-
-.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } 
-
-catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(QueriesAndViewingDataForm.class  
-
-.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } 
-
-catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(QueriesAndViewingDataForm.class  
-
-.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } 
-
-catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(QueriesAndViewingDataForm.class  
-
-.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(QueriesAndViewingDataForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(QueriesAndViewingDataForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(QueriesAndViewingDataForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(QueriesAndViewingDataForm.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() 
-            {
-                try 
-                {
-                  //  new QueriesAndViewingDataForm().setVisible(true);
-                }
-                catch (Exception ex) 
-                {
+            public void run() {
+                try {
+                    //  new QueriesAndViewingDataForm().setVisible(true);
+                } catch (Exception ex) {
                     Logger.getLogger(QueriesAndViewingDataForm.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }

@@ -3,13 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package java5774_1248_0915_gui;
 
-import MyPackages.Policy;
-import MyPackages.Policy.InsrncCmpny;
-import MyPackages.Policy.PlicyType;
-import DataAccessObject.IBackend_DAO_List_impl;
+import DataAccessObject.Controller;
 import DataAccessObject.Singelton;
 import java.awt.Color;
 import java.awt.TextField;
@@ -22,12 +18,15 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import Packages.Policy;
+import Packages.Policy.InsrncCmpny;
+import Packages.Policy.PlicyType;
 
 /**
- *
  * @author dell
  */
 public class AddPolicyForm extends javax.swing.JFrame {
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -36,29 +35,29 @@ public class AddPolicyForm extends javax.swing.JFrame {
     private final Runnable enableFotherFormOfPolicyMyFunc;
     private long per_id;
     private JTable Policytable;
-    private Policy policy=null; 
-    private ArrayList<String> detailsList =null;
-    
-    private static IBackend_DAO_List_impl sngltn = null;
+    private Policy policy = null;
+    private ArrayList<String> detailsList = null;
+
+    private static Controller sngltn = null;
+
     static {
-                try 
-                {
-                sngltn=Singelton.getMySingelton();
-                } 
-                catch (Exception ex) 
-                {
-                    Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            };
-    public AddPolicyForm(long PerId,JTable jtablePolicy,Runnable myfunc) throws Exception {
-        enableFotherFormOfPolicyMyFunc=myfunc;
-        per_id=PerId;
-        Policytable=jtablePolicy;
-        detailsList =new ArrayList<String>();
+        try {
+            sngltn = Singelton.getMySingelton();
+        } catch (Exception ex) {
+            Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    // Ctor
+    public AddPolicyForm(long PerId, JTable jtablePolicy, Runnable myfunc) throws Exception {
+        enableFotherFormOfPolicyMyFunc = myfunc;
+        per_id = PerId;
+        Policytable = jtablePolicy;
+        detailsList = new ArrayList<String>();
         initComponents();
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
-        
+
         ComboBoxPolicyType.setModel(new DefaultComboBoxModel(PlicyType.values()));
         ComboBoxInsuranceCompany.setModel(new DefaultComboBoxModel(InsrncCmpny.values()));
         EnterDetail0.setVisible(true);
@@ -70,32 +69,31 @@ public class AddPolicyForm extends javax.swing.JFrame {
         buttonMinus1.setVisible(false);
         buttonMinus2.setVisible(false);
         buttonMinus3.setVisible(false);
-        
+
         this.setSize(502, 405);
-        
+
         TextPerson_Name_ID.setEnabled(false);
-        TextPerson_Name_ID.setText("Person Name: "+ 
-                                    sngltn.GetMyPersonCstmrCrd(per_id).getPer().getPerName() + "\n"+
-                                    "Preson ID: "+
-                                    Long.toString(per_id)
-                                    );
-        jSpinnerPolicyId.setValue(sngltn.getPolicyID()[0]);
-        
-       
+        TextPerson_Name_ID.setText("Person Name: "
+                + sngltn.GetMyPersonCstmrCrd(per_id).getPerson().getNamePerson() + "\n"
+                + "Preson ID: "
+                + Long.toString(per_id)
+        );
+        jSpinnerPolicyId.setValue(sngltn.getActivityId()[0]);
     }
 
-    private AddPolicyForm() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    
-     private void formWindowOpened(java.awt.event.WindowEvent evt) {                                  
-        int lebar = this.getWidth()/2;
-        int tinggi = this.getHeight()/2;
-        int x = (Toolkit.getDefaultToolkit().getScreenSize().width/2)-lebar;
-        int y = (Toolkit.getDefaultToolkit().getScreenSize().height/2)-tinggi;
+//    //To change body of generated methods, choose Tools | Templates.
+//    private AddPolicyForm() { 
+//        throw new UnsupportedOperationException("Not supported yet."); 
+//    }
+    // alignment the window
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {
+        int lebar = this.getWidth() / 2;
+        int tinggi = this.getHeight() / 2;
+        int x = (Toolkit.getDefaultToolkit().getScreenSize().width / 2) - lebar;
+        int y = (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - tinggi;
         this.setLocation(x, y);
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -332,75 +330,61 @@ public class AddPolicyForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_EnterDetail0ActionPerformed
 
+    // add this new policy
     private void buttonAddThisPolicyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddThisPolicyActionPerformed
-        if (!CheckAllInputText(
-                                ThereIsText(EnterRepresentativeName.getText()),
-                                ThereIsText(jSpinnerPolicyRate.getValue().toString()),
-                                 EnterDetail0.isVisible() && ThereIsText(EnterDetail0.getText()),
-                                !EnterDetail1.isVisible()||(EnterDetail1.isVisible() && ThereIsText(EnterDetail1.getText())),
-                                !EnterDetail2.isVisible()||(EnterDetail2.isVisible() && ThereIsText(EnterDetail2.getText())),
-                                !EnterDetail3.isVisible()||(EnterDetail3.isVisible() && ThereIsText(EnterDetail3.getText()))
-                              )
-           )JOptionPane.showMessageDialog(null, "Insert valid values", "Error",JOptionPane.ERROR_MESSAGE);
-
-       else if("Adding the policy".equals(buttonAddThisPolicy.getLabel()))
-        {
-            detailsList=exsitDetailsToList(EnterDetail0, EnterDetail1, EnterDetail2, EnterDetail3);
+        if (!CheckAllInputText( // check all required fields not empty
+                ThereIsText(EnterRepresentativeName.getText()),
+                ThereIsText(jSpinnerPolicyRate.getValue().toString()),
+                EnterDetail0.isVisible() && ThereIsText(EnterDetail0.getText()),
+                !EnterDetail1.isVisible() || (EnterDetail1.isVisible() && ThereIsText(EnterDetail1.getText())),
+                !EnterDetail2.isVisible() || (EnterDetail2.isVisible() && ThereIsText(EnterDetail2.getText())),
+                !EnterDetail3.isVisible() || (EnterDetail3.isVisible() && ThereIsText(EnterDetail3.getText()))
+        )) {
+            JOptionPane.showMessageDialog(null, "Insert valid values", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if ("Adding the policy".equals(buttonAddThisPolicy.getLabel())) {
+            detailsList = exsitDetailsToList(EnterDetail0, EnterDetail1, EnterDetail2, EnterDetail3);
             try {
-                policy=new Policy(
-                        sngltn.getPolicyID(),
-                        (PlicyType)ComboBoxPolicyType.getSelectedItem(),
-                        (InsrncCmpny)ComboBoxInsuranceCompany.getSelectedItem(),
+                policy = new Policy(
+                        (PlicyType) ComboBoxPolicyType.getSelectedItem(),
+                        (InsrncCmpny) ComboBoxInsuranceCompany.getSelectedItem(),
                         Float.valueOf(jSpinnerPolicyRate.getValue().toString()),
                         EnterRepresentativeName.getText(),
-                        (Date)jSpinnerOpeningDate.getValue(),
+                        (Date) jSpinnerOpeningDate.getValue(),
                         detailsList
                 );
-            } 
-            catch (Exception ex) 
-            {
+            } catch (Exception ex) {
                 Logger.getLogger(AddPolicyForm.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            try 
-            {
-                sngltn.AddNewPolicy(policy, sngltn.GetMyPersonCstmrCrd(per_id).getPer());
-            }
-            catch (Exception ex) 
-            {
+
+            try {
+                jSpinnerPolicyId.setValue(sngltn.AddNewPolicy(policy, sngltn.GetMyPersonCstmrCrd(per_id).getPerson()));
+            } catch (Exception ex) {
                 Logger.getLogger(AddPolicyForm.class.getName()).log(Level.SEVERE, null, ex);
             }
-            JOptionPane.showMessageDialog(null, "Adding CustomerCrd.Activity.Policy Successfully","",JOptionPane.PLAIN_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Adding CustomerCrd.Activity.Policy Successfully", "", JOptionPane.PLAIN_MESSAGE);
+
             buttonAddThisPolicy.setLabel("Update This Policy");
             ComboBoxPolicyType.setEnabled(false);
+        } else if ("Update This Policy".equals(buttonAddThisPolicy.getLabel())) {
+            try {
+                policy = sngltn.GetPolicyById(Long.parseLong(jSpinnerPolicyId.getValue().toString()));
+            } catch (Exception ex) {
+                Logger.getLogger(AddPolicyForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            policy.setRepresentativeName(EnterRepresentativeName.getText());
+            policy.setInsuranceCompany((InsrncCmpny) ComboBoxInsuranceCompany.getSelectedItem());
+            policy.setPolicyRate(Float.valueOf(jSpinnerPolicyRate.getValue().toString()));
+            policy.setMoreDetails(exsitDetailsToList(EnterDetail0, EnterDetail1, EnterDetail2, EnterDetail3));
+            try {
+                sngltn.UpdatePolicy(policy, sngltn.GetMyPersonCstmrCrd(per_id).getPerson());
+            } catch (Exception ex) {
+                Logger.getLogger(AddPolicyForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            JOptionPane.showMessageDialog(null, "Update Policy Successfully", "", JOptionPane.PLAIN_MESSAGE);
         }
-        
-        else if("Update This Policy".equals(buttonAddThisPolicy.getLabel()))
-                {            
-                    try 
-                    {
-                        policy=sngltn.GetPolicyById(Long.parseLong(jSpinnerPolicyId.getValue().toString()));
-                    } 
-                    catch (Exception ex) 
-                    {
-                        Logger.getLogger(AddPolicyForm.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    policy.setRepresentativeName(EnterRepresentativeName.getText());
-                    policy.setInsuranceCompany((InsrncCmpny)ComboBoxInsuranceCompany.getSelectedItem());
-                    policy.setPolicyRate(Float.valueOf(jSpinnerPolicyRate.getValue().toString()));
-                    policy.setMoreDetails(exsitDetailsToList(EnterDetail0, EnterDetail1, EnterDetail2, EnterDetail3));
-                    try 
-                    {
-                        sngltn.UpdatePolicy(policy, sngltn.GetMyPersonCstmrCrd(per_id).getPer());
-                    }
-                    catch (Exception ex) 
-                    {
-                        Logger.getLogger(AddPolicyForm.class.getName()).log(Level.SEVERE, null, ex);
-                    }     
-                    JOptionPane.showMessageDialog(null, "Update Policy Successfully", "",JOptionPane.PLAIN_MESSAGE);        
-                }
     }//GEN-LAST:event_buttonAddThisPolicyActionPerformed
 
+    // fetures of +/- more details
     private void buttonPlus0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPlus0ActionPerformed
         EnterDetail0.setVisible(true);
         EnterDetail1.setVisible(true);
@@ -417,6 +401,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         this.setSize(502, 445);
     }//GEN-LAST:event_buttonPlus0ActionPerformed
 
+    // fetures of +/- more details
     private void buttonPlus1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPlus1ActionPerformed
         EnterDetail0.setVisible(true);
         EnterDetail1.setVisible(true);
@@ -436,11 +421,12 @@ public class AddPolicyForm extends javax.swing.JFrame {
         this.setSize(502, 485);
     }//GEN-LAST:event_buttonPlus1ActionPerformed
 
+    // fetures of +/- more details
     private void buttonPlus2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPlus2ActionPerformed
         EnterDetail0.setVisible(true);
         EnterDetail1.setVisible(true);
         EnterDetail2.setVisible(true);
-        EnterDetail3.setVisible(true);  
+        EnterDetail3.setVisible(true);
         buttonPlus0.setVisible(false);
         buttonPlus0.setEnabled(false);
         buttonPlus1.setVisible(false);
@@ -456,6 +442,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         this.setSize(502, 515);
     }//GEN-LAST:event_buttonPlus2ActionPerformed
 
+    // fetures of +/- more details
     private void buttonMinus3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMinus3ActionPerformed
         EnterDetail3.setVisible(false);
         buttonPlus0.setVisible(false);
@@ -473,6 +460,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         this.setSize(502, 485);
     }//GEN-LAST:event_buttonMinus3ActionPerformed
 
+    // fetures of +/- more details
     private void buttonMinus2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMinus2ActionPerformed
         EnterDetail3.setVisible(false);
         EnterDetail2.setVisible(false);
@@ -491,6 +479,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         this.setSize(502, 445);
     }//GEN-LAST:event_buttonMinus2ActionPerformed
 
+    // fetures of +/- more details
     private void buttonMinus1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMinus1ActionPerformed
         EnterDetail3.setVisible(false);
         EnterDetail2.setVisible(false);
@@ -516,26 +505,24 @@ public class AddPolicyForm extends javax.swing.JFrame {
     }//GEN-LAST:event_EnterDetail1ActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-                                    
+
     }//GEN-LAST:event_formWindowClosed
 
+    // closing window events
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        try 
-        {
+        try {
             enableFotherFormOfPolicyMyFunc.run();
-            DefaultTableModel model=(DefaultTableModel)Policytable.getModel();
+            DefaultTableModel model = (DefaultTableModel) Policytable.getModel();
             model.setRowCount(0);
-            for(Policy policy : sngltn.GetPerPolicies(sngltn.GetMyPersonCstmrCrd(per_id).getPer()))
-            {
-                model.addRow(new Object[] {String.valueOf(policy.getPolicyId()),String.valueOf(policy.getOpeningDate()),String.valueOf(policy.getRepresentativeName()),String.valueOf(policy.getPolicyType()),String.valueOf(policy.getInsuranceCompany()),policy.getPolicyRate()});
-            }                           
-        }
-        catch (Exception ex) 
-        {
+            for (Policy policy : sngltn.GetPerPolicies(sngltn.GetMyPersonCstmrCrd(per_id).getPerson())) {
+                model.addRow(new Object[]{String.valueOf(policy.getId()), String.valueOf(policy.getOpeningDate()), String.valueOf(policy.getRepresentativeName()), String.valueOf(policy.getPolicyType()), String.valueOf(policy.getInsuranceCompany()), policy.getPolicyRate()});
+            }
+        } catch (Exception ex) {
             Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_formWindowClosing
 
+    // handle tooltip label
     private void representative_name_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_representative_name_cursor_in_handler
         if (EnterRepresentativeName.getText().equals("Enter Representative Name")) {
             EnterRepresentativeName.setText(null);
@@ -544,6 +531,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_representative_name_cursor_in_handler
 
+    // handle tooltip label
     private void representative_name_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_representative_name_cursor_out_handler
         if (EnterRepresentativeName.getText().length() < 1) {
             EnterRepresentativeName.setText("Enter Representative Name");
@@ -552,6 +540,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_representative_name_cursor_out_handler
 
+    // handle tooltip label
     private void detail0_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail0_cursor_in_handler
         if (EnterDetail0.getText().equals("Enter Detail")) {
             EnterDetail0.setText(null);
@@ -560,6 +549,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail0_cursor_in_handler
 
+    // handle tooltip label
     private void detail1_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail1_cursor_in_handler
         if (EnterDetail1.getText().equals("Enter Detail")) {
             EnterDetail1.setText(null);
@@ -568,6 +558,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail1_cursor_in_handler
 
+    // handle tooltip label
     private void detail2_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail2_cursor_in_handler
         if (EnterDetail2.getText().equals("Enter Detail")) {
             EnterDetail2.setText(null);
@@ -576,6 +567,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail2_cursor_in_handler
 
+    // handle tooltip label
     private void detail3_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail3_cursor_in_handler
         if (EnterDetail3.getText().equals("Enter Detail")) {
             EnterDetail3.setText(null);
@@ -584,6 +576,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail3_cursor_in_handler
 
+    // handle tooltip label
     private void detail3_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail3_cursor_out_handler
         if (EnterDetail3.getText().length() < 1) {
             EnterDetail3.setText("Enter Detail");
@@ -592,6 +585,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail3_cursor_out_handler
 
+    // handle tooltip label
     private void detail2_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail2_cursor_out_handler
         if (EnterDetail2.getText().length() < 1) {
             EnterDetail2.setText("Enter Detail");
@@ -600,6 +594,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail2_cursor_out_handler
 
+    // handle tooltip label
     private void detail1_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail1_cursor_out_handler
         if (EnterDetail1.getText().length() < 1) {
             EnterDetail1.setText("Enter Detail");
@@ -608,6 +603,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail1_cursor_out_handler
 
+    // handle tooltip label
     private void detail0_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail0_cursor_out_handler
         if (EnterDetail0.getText().length() < 1) {
             EnterDetail0.setText("Enter Detail");
@@ -615,96 +611,96 @@ public class AddPolicyForm extends javax.swing.JFrame {
             EnterDetail0.setForeground(new java.awt.Color(153, 153, 153));
         }
     }//GEN-LAST:event_detail0_cursor_out_handler
-        
-    private boolean CheckAllInputText(boolean str1 ,boolean str2 , boolean str3, boolean str4 , boolean str5 , boolean str6  ){ 
-             boolean reslt=true;
-             if(str1==false) 
-                {
-                 EnterRepresentativeName.setBackground(Color.red);
-                 reslt=false;
-                }
-             else
-                 EnterRepresentativeName.setBackground(Color.white);
-             
-             if(str2==false) 
-                {
-                 jSpinnerPolicyRate.setBackground(Color.red);
-                 reslt=false;
-                }
-             else
-                 jSpinnerPolicyRate.setBackground(Color.white);
-             
-             if(str3==false) 
-                {
-                 EnterDetail0.setBackground(Color.red);
-                 reslt=false;
-                }
-             else
-                 EnterDetail0.setBackground(Color.white);
-             
-             if(str4==false) 
-                {
-                 EnterDetail1.setBackground(Color.red);
-                 reslt=false;
-                }
-              else
-                 EnterDetail1.setBackground(Color.white);
-             
-              if(str5==false) 
-                {
-                 EnterDetail2.setBackground(Color.red);
-                 reslt=false;
-                }
-              else
-                 EnterDetail2.setBackground(Color.white);
-              
-              if(str6==false) 
-                {
-                 EnterDetail3.setBackground(Color.red);
-                 reslt=false;
-                }
-              else
-                 EnterDetail3.setBackground(Color.white);
-             
-             return reslt;
+
+    // checks for input fields
+    private boolean CheckAllInputText(boolean str1, boolean str2, boolean str3, boolean str4, boolean str5, boolean str6) {
+        boolean reslt = true;
+        if (str1 == false) {
+            EnterRepresentativeName.setBackground(Color.red);
+            reslt = false;
+        } else {
+            EnterRepresentativeName.setBackground(Color.white);
+        }
+
+        if (str2 == false) {
+            jSpinnerPolicyRate.setBackground(Color.red);
+            reslt = false;
+        } else {
+            jSpinnerPolicyRate.setBackground(Color.white);
+        }
+
+        if (str3 == false) {
+            EnterDetail0.setBackground(Color.red);
+            reslt = false;
+        } else {
+            EnterDetail0.setBackground(Color.white);
+        }
+
+        if (str4 == false) {
+            EnterDetail1.setBackground(Color.red);
+            reslt = false;
+        } else {
+            EnterDetail1.setBackground(Color.white);
+        }
+
+        if (str5 == false) {
+            EnterDetail2.setBackground(Color.red);
+            reslt = false;
+        } else {
+            EnterDetail2.setBackground(Color.white);
+        }
+
+        if (str6 == false) {
+            EnterDetail3.setBackground(Color.red);
+            reslt = false;
+        } else {
+            EnterDetail3.setBackground(Color.white);
+        }
+
+        return reslt;
     }
-    
-    
-        private boolean ThereIsText(String str){ 
-            try{ 
-                int ln = str.length();
-                if ((ln == 0) || (str.equals("Enter Representative Name"))) 
-                    return false;
-            }
 
-            catch(NumberFormatException n){ 
-                return false; 
-            } 
-            return true;
-        }
-    
-            private static boolean OnlyNumbers(String str){ 
-            try{ 
-                long l = Long.parseLong(str); 
+    // check if there is text in field
+    private boolean ThereIsText(String str) {
+        try {
+            int ln = str.length();
+            if ((ln == 0) || (str.equals("Enter Representative Name"))) {
+                return false;
             }
+        } catch (NumberFormatException n) {
+            return false;
+        }
+        return true;
+    }
 
-            catch(NumberFormatException n)
-            { 
-                return false; 
-            } 
-            return true;
+    // check numeric
+    private static boolean OnlyNumbers(String str) {
+        try {
+            long l = Long.parseLong(str);
+        } catch (NumberFormatException n) {
+            return false;
         }
-        
-        private ArrayList<String> exsitDetailsToList (TextField textfield0,TextField textfield1,TextField textfield2,TextField textfield3)
-        {
-           ArrayList<String> DetailList = new ArrayList<String>();
-           if(textfield0.isVisible() && !"".equals(textfield0.getText())) DetailList.add(textfield0.getText());
-           if(textfield1.isVisible() && !"".equals(textfield1.getText())) DetailList.add(textfield1.getText());
-           if(textfield2.isVisible() && !"".equals(textfield2.getText())) DetailList.add(textfield2.getText());
-           if(textfield3.isVisible() && !"".equals(textfield3.getText())) DetailList.add(textfield3.getText());
-           return DetailList;   
+        return true;
+    }
+
+    // add the exist "more details" to the list
+    private ArrayList<String> exsitDetailsToList(TextField textfield0, TextField textfield1, TextField textfield2, TextField textfield3) {
+        ArrayList<String> DetailList = new ArrayList<String>();
+        if (textfield0.isVisible() && !"".equals(textfield0.getText())) {
+            DetailList.add(textfield0.getText());
         }
-        
+        if (textfield1.isVisible() && !"".equals(textfield1.getText())) {
+            DetailList.add(textfield1.getText());
+        }
+        if (textfield2.isVisible() && !"".equals(textfield2.getText())) {
+            DetailList.add(textfield2.getText());
+        }
+        if (textfield3.isVisible() && !"".equals(textfield3.getText())) {
+            DetailList.add(textfield3.getText());
+        }
+        return DetailList;
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -735,7 +731,7 @@ public class AddPolicyForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-               // new AddPolicyForm().setVisible(true);
+                // new AddPolicyForm().setVisible(true);
             }
         });
     }

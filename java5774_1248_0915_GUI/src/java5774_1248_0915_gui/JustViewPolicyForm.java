@@ -3,25 +3,24 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package java5774_1248_0915_gui;
 
-import MyPackages.Policy;
-import MyPackages.Policy.InsrncCmpny;
-import MyPackages.Policy.PlicyType;
-import DataAccessObject.IBackend_DAO_List_impl;
+import DataAccessObject.Controller;
 import DataAccessObject.Singelton;
 import java.awt.Toolkit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTable;
+import Packages.Policy;
+import Packages.Policy.InsrncCmpny;
+import Packages.Policy.PlicyType;
 
 /**
- *
  * @author dell
  */
 public class JustViewPolicyForm extends javax.swing.JFrame {
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -29,84 +28,79 @@ public class JustViewPolicyForm extends javax.swing.JFrame {
      */
     private long per_id;
     private long policy_id;
-    
-    private Policy policy=null; 
-    private static IBackend_DAO_List_impl sngltn = null;
+
+    private Policy policy = null;
+    private static Controller sngltn = null;
+
     static {
-                try 
-                {
-                sngltn=Singelton.getMySingelton();
-                } 
-                catch (Exception ex) 
-                {
-                    Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            };
-    public JustViewPolicyForm(long PerId,Object PolicyID) throws Exception {
-        per_id=PerId;
-        policy_id=Long.valueOf(PolicyID.toString());
-        
-        policy =new Policy();
-        policy=sngltn.GetPolicyById(policy_id);
-        
-        int NumOfDetails=policy.getMoreDetails().size();
-        
+        try {
+            sngltn = Singelton.getMySingelton();
+        } catch (Exception ex) {
+            Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    // Ctor
+    public JustViewPolicyForm(long PerId, Object PolicyID) throws Exception {
+        per_id = PerId;
+        policy_id = Long.valueOf(PolicyID.toString());
+
+        policy = new Policy();
+        policy = sngltn.GetPolicyById(policy_id);
+
+        int NumOfDetails = policy.getMoreDetailsSize();
+
         initComponents();
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
-        
+
         ComboBoxPolictType.setModel(new DefaultComboBoxModel(PlicyType.values()));
         ComboBoxInsuranceCompany.setModel(new DefaultComboBoxModel(InsrncCmpny.values()));
-        
+
         DetailsFieldsFirstDesplay(NumOfDetails);
-        
+
         TextPerson_Name_ID.setEnabled(false);
-        TextPerson_Name_ID.setText("Person Name: "+ 
-                                    sngltn.GetMyPersonCstmrCrd(per_id).getPer().getPerName() + "\n"+
-                                    "Preson ID: "+
-                                    Long.toString(per_id)
-                                    );
+        TextPerson_Name_ID.setText("Person Name: "
+                + sngltn.GetMyPersonCstmrCrd(per_id).getPerson().getNamePerson() + "\n"
+                + "Preson ID: "
+                + Long.toString(per_id)
+        );
         EnterRepresentativeName.setText(policy.getRepresentativeName());
         jSpinnerPolicyId.setValue(policy_id);
         ComboBoxPolictType.setSelectedItem(policy.getPolicyType());
         ComboBoxInsuranceCompany.setSelectedItem(policy.getInsuranceCompany());
         jSpinnerOpeningDate.setValue(policy.getOpeningDate());
         jSpinnerPolicyRate.setValue(policy.getPolicyRate());
-        if (NumOfDetails==1)
-            EnterDetail0.setText(policy.getMoreDetails().get(0));
-        else if (NumOfDetails==2)
-                                {
-                                    EnterDetail0.setText(policy.getMoreDetails().get(0));
-                                    EnterDetail1.setText(policy.getMoreDetails().get(1));
-                                }
-        else if (NumOfDetails==3)
-                                {
-                                    EnterDetail0.setText(policy.getMoreDetails().get(0));
-                                    EnterDetail1.setText(policy.getMoreDetails().get(1));
-                                    EnterDetail2.setText(policy.getMoreDetails().get(2));
-                                }
-         else if (NumOfDetails==4)
-                                {
-                                    EnterDetail0.setText(policy.getMoreDetails().get(0));
-                                    EnterDetail1.setText(policy.getMoreDetails().get(1));
-                                    EnterDetail2.setText(policy.getMoreDetails().get(2));
-                                    EnterDetail3.setText(policy.getMoreDetails().get(3));
-                                }
-       
+        if (NumOfDetails == 1) {
+            EnterDetail0.setText(policy.getMoreDetailsValues().get(0));
+        } else if (NumOfDetails == 2) {
+            EnterDetail0.setText(policy.getMoreDetailsValues().get(0));
+            EnterDetail1.setText(policy.getMoreDetailsValues().get(1));
+        } else if (NumOfDetails == 3) {
+            EnterDetail0.setText(policy.getMoreDetailsValues().get(0));
+            EnterDetail1.setText(policy.getMoreDetailsValues().get(1));
+            EnterDetail2.setText(policy.getMoreDetailsValues().get(2));
+        } else if (NumOfDetails == 4) {
+            EnterDetail0.setText(policy.getMoreDetailsValues().get(0));
+            EnterDetail1.setText(policy.getMoreDetailsValues().get(1));
+            EnterDetail2.setText(policy.getMoreDetailsValues().get(2));
+            EnterDetail3.setText(policy.getMoreDetailsValues().get(3));
+        }
     }
 
     private JustViewPolicyForm() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    
-     private void formWindowOpened(java.awt.event.WindowEvent evt) {                                  
-        int lebar = this.getWidth()/2;
-        int tinggi = this.getHeight()/2;
-        int x = (Toolkit.getDefaultToolkit().getScreenSize().width/2)-lebar;
-        int y = (Toolkit.getDefaultToolkit().getScreenSize().height/2)-tinggi;
+    // alignment the window
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {
+        int lebar = this.getWidth() / 2;
+        int tinggi = this.getHeight() / 2;
+        int x = (Toolkit.getDefaultToolkit().getScreenSize().width / 2) - lebar;
+        int y = (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - tinggi;
         this.setLocation(x, y);
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -254,49 +248,40 @@ public class JustViewPolicyForm extends javax.swing.JFrame {
     }//GEN-LAST:event_EnterDetail1ActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-                                    
+
     }//GEN-LAST:event_formWindowClosed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
 
     }//GEN-LAST:event_formWindowClosing
-                  
-        private void DetailsFieldsFirstDesplay(int list_lentgh)
-        {
-            if (list_lentgh==1)
-                          {
-                            EnterDetail0.setVisible(true);
-                            EnterDetail1.setVisible(false);
-                            EnterDetail2.setVisible(false);
-                            EnterDetail3.setVisible(false);
-                            this.setSize(430, 405);
-                          }
-        else if (list_lentgh==2)
-                                {
-                                  EnterDetail0.setVisible(true);
-                                  EnterDetail1.setVisible(true);
-                                  this.setSize(430, 445);
-                                }
-        
-        else if (list_lentgh==3)
-                                {
-                                EnterDetail0.setVisible(true);
-                                EnterDetail1.setVisible(true);
-                                EnterDetail2.setVisible(true);
-                                this.setSize(430, 485);
-                                }
-        else if (list_lentgh==4)
-                                {
-                                 EnterDetail0.setVisible(true);
-                                 EnterDetail1.setVisible(true);
-                                 EnterDetail2.setVisible(true);
-                                 EnterDetail3.setVisible(true);  
-                                 this.setSize(430, 520);
-                                }
-        
+
+    // fill the "more details" fields accordimg the exists
+    private void DetailsFieldsFirstDesplay(int list_lentgh) {
+        if (list_lentgh == 1) {
+            EnterDetail0.setVisible(true);
+            EnterDetail1.setVisible(false);
+            EnterDetail2.setVisible(false);
+            EnterDetail3.setVisible(false);
+            this.setSize(430, 405);
+        } else if (list_lentgh == 2) {
+            EnterDetail0.setVisible(true);
+            EnterDetail1.setVisible(true);
+            this.setSize(430, 445);
+        } else if (list_lentgh == 3) {
+            EnterDetail0.setVisible(true);
+            EnterDetail1.setVisible(true);
+            EnterDetail2.setVisible(true);
+            this.setSize(430, 485);
+        } else if (list_lentgh == 4) {
+            EnterDetail0.setVisible(true);
+            EnterDetail1.setVisible(true);
+            EnterDetail2.setVisible(true);
+            EnterDetail3.setVisible(true);
+            this.setSize(430, 520);
         }
-        
-        
+
+    }
+
     /**
      * @param args the command line arguments
      */

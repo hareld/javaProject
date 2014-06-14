@@ -3,15 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package java5774_1248_0915_gui;
 
-import MyPackages.Activity;
-import MyPackages.Claim;
-import MyPackages.Policy;
-import DataAccessObject.IBackend_DAO_List_impl;
+import DataAccessObject.Controller;
 import DataAccessObject.Singelton;
-import MyPackages.CustomerCrd;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -20,159 +15,134 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import Packages.Activity;
+import Packages.CustomerCrd;
+import Packages.Policy;
 
 /**
- *
  * @author dell
  */
 public class PoliciesTableViewForm extends javax.swing.JFrame {
+
     private static final long serialVersionUID = 1L;
-    private ArrayList<Policy> arrPolicy=null;
-    
-    private static IBackend_DAO_List_impl sngltn = null;
+    private ArrayList<Policy> arrPolicy = null;
+
+    private static Controller sngltn = null;
     private DefaultTableModel model1;
+
     static {
-                try 
-                {
-                sngltn=Singelton.getMySingelton();
-                } 
-                catch (Exception ex) 
-                {
-                    Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            };
-    /**
-     * Creates new form AddCstmrCrdForm
-     * @param person_id
-     * @throws java.lang.Exception
-     */
+        try {
+            sngltn = Singelton.getMySingelton();
+        } catch (Exception ex) {
+            Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    // Ctor - veiw the policies in the table
     public PoliciesTableViewForm(String buttonText) throws Exception {
 
         initComponents();
-        model1 = (DefaultTableModel)jTablePolicyView.getModel();
+        model1 = (DefaultTableModel) jTablePolicyView.getModel();
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
 
-                
-        if (buttonText=="View All Policies")
-        {
-            JTextPanePolicyViewDescription.setText(buttonText);  
-            try 
-           {
-               model1.setRowCount(0);
-               for(Policy policy : sngltn.GetAllPolicies())
-               {
-                   model1.addRow(new Object[] {getPerIdByPolicyId(policy.getPolicyId()),String.valueOf(policy.getPolicyId()),String.valueOf(policy.getOpeningDate()),String.valueOf(policy.getRepresentativeName()),String.valueOf(policy.getPolicyType()),String.valueOf(policy.getInsuranceCompany()),policy.getPolicyRate()});
-               }                         
-           } 
-           catch (Exception ex) 
-           {
-               Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-           }
+        if (buttonText == "View All Policies") {
+            JTextPanePolicyViewDescription.setText(buttonText);
+            try {
+                model1.setRowCount(0);
+                for (Policy policy : sngltn.GetAllPolicies()) {
+                    model1.addRow(new Object[]{getPerIdByPolicyId(policy.getId()), String.valueOf(policy.getId()), String.valueOf(policy.getOpeningDate()), String.valueOf(policy.getRepresentativeName()), String.valueOf(policy.getPolicyType()), String.valueOf(policy.getInsuranceCompany()), policy.getPolicyRate()});
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        
-         
+
         jTablePolicyView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-               if (e.getClickCount() == 1) {
-                    JTable target = (JTable)e.getSource();
+                if (e.getClickCount() == 1) {
+                    JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
-                    
-                    JustViewPolicyForm ViewPolicyForm= null;
-                    try
-                    {
-                      ViewPolicyForm = new  JustViewPolicyForm((long) model1.getValueAt(row,0),model1.getValueAt(row,1));
-                    }
-                    catch (Exception ex) 
-                    {
+
+                    JustViewPolicyForm ViewPolicyForm = null;
+                    try {
+                        ViewPolicyForm = new JustViewPolicyForm((long) model1.getValueAt(row, 0), model1.getValueAt(row, 1));
+                    } catch (Exception ex) {
                         Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    ViewPolicyForm .show();
-                  }
-             }
+                    ViewPolicyForm.show();
+                }
+            }
         });
-        
     }
-    
-    public PoliciesTableViewForm(String buttonText , Policy.PlicyType polcyType) throws Exception {
 
+    // Ctor - view the claims in table according the recieved policy type
+    public PoliciesTableViewForm(String buttonText, Policy.PlicyType polcyType) throws Exception {
 
         initComponents();
-        model1 = (DefaultTableModel)jTablePolicyView.getModel();
+        model1 = (DefaultTableModel) jTablePolicyView.getModel();
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
 
-                
-        if ("View all Policies with this policy type".equals(buttonText))
-        {
-            JTextPanePolicyViewDescription.setText("View all Policies with policy type: "+polcyType.toString());  
-            try 
-           {
-               model1.setRowCount(0);
-               for(CustomerCrd ctmrCrd :sngltn.GetAllCustemers())
-               {    
-                    for(Policy policy : sngltn.GetMyTypePolicies(polcyType, ctmrCrd.getPer()))
-                    {
-                        model1.addRow(new Object[] {getPerIdByPolicyId(policy.getPolicyId()),String.valueOf(policy.getPolicyId()),String.valueOf(policy.getOpeningDate()),String.valueOf(policy.getRepresentativeName()),String.valueOf(policy.getPolicyType()),String.valueOf(policy.getInsuranceCompany()),policy.getPolicyRate()});
+        if ("View all Policies with this policy type".equals(buttonText)) {
+            JTextPanePolicyViewDescription.setText("View all Policies with policy type: " + polcyType.toString());
+            try {
+                model1.setRowCount(0);
+                for (CustomerCrd ctmrCrd : sngltn.GetAllCustemers()) {
+                    for (Policy policy : sngltn.GetMyTypePolicies(polcyType, ctmrCrd.getPerson())) {
+                        model1.addRow(new Object[]{getPerIdByPolicyId(policy.getId()), String.valueOf(policy.getId()), String.valueOf(policy.getOpeningDate()), String.valueOf(policy.getRepresentativeName()), String.valueOf(policy.getPolicyType()), String.valueOf(policy.getInsuranceCompany()), policy.getPolicyRate()});
                     }
-               }                         
-           } 
-           catch (Exception ex) 
-           {
-               Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-           }
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        
-         
+
         jTablePolicyView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-               if (e.getClickCount() == 1) {
-                    JTable target = (JTable)e.getSource();
+                if (e.getClickCount() == 1) {
+                    JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
-                    
-                    JustViewPolicyForm ViewPolicyForm= null;
-                    try
-                    {
-                      ViewPolicyForm = new  JustViewPolicyForm((long) model1.getValueAt(row,0),model1.getValueAt(row,1));
-                    }
-                    catch (Exception ex) 
-                    {
+
+                    JustViewPolicyForm ViewPolicyForm = null;
+                    try {
+                        ViewPolicyForm = new JustViewPolicyForm((long) model1.getValueAt(row, 0), model1.getValueAt(row, 1));
+                    } catch (Exception ex) {
                         Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    ViewPolicyForm .show();
-                  }
-             }
+                    ViewPolicyForm.show();
+                }
+            }
         });
-        
+
     }
-    
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {                                  
-        int lebar = this.getWidth()/2;
-        int tinggi = this.getHeight()/2;
-        int x = (Toolkit.getDefaultToolkit().getScreenSize().width/2)-lebar;
-        int y = (Toolkit.getDefaultToolkit().getScreenSize().height/2)-tinggi;
+
+    // alignment the window
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {
+        int lebar = this.getWidth() / 2;
+        int tinggi = this.getHeight() / 2;
+        int x = (Toolkit.getDefaultToolkit().getScreenSize().width / 2) - lebar;
+        int y = (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - tinggi;
         this.setLocation(x, y);
     }
-     
-    private long getPerIdByPolicyId(long policyId) throws Exception
-     {
-      for (CustomerCrd cstmr :sngltn.GetAllCustemers())
-        {
-          for (Activity act:cstmr.getPerActivities())
-          {
-              if (act instanceof Policy)
-              {
-                  Policy plcy=(Policy)act;
-                  if (plcy.getPolicyId()==policyId)
-                      return cstmr.getPer().getPerId();
-              }
-          }
+
+    // get the person id by the policy id of the customer card
+    private long getPerIdByPolicyId(long policyId) throws Exception {
+        for (CustomerCrd cstmr : sngltn.GetAllCustemers()) {
+            for (Activity act : cstmr.getActivities()) {
+                if (act instanceof Policy) {
+                    Policy plcy = (Policy) act;
+                    if (plcy.getId() == policyId) {
+                        return cstmr.getPerson().getId();
+                    }
+                }
+            }
         }
         return 0;
-     }
-     
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -189,6 +159,7 @@ public class PoliciesTableViewForm extends javax.swing.JFrame {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTablePolicyView = new javax.swing.JTable();
         jLabel6 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
 
         jMenu1.setText("jMenu1");
 
@@ -249,6 +220,9 @@ public class PoliciesTableViewForm extends javax.swing.JFrame {
         jLabel6.setText(" Policies  table:");
         SelectWhichNewActv.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 0, 160, -1));
 
+        jLabel1.setText("Select Policy to View:");
+        SelectWhichNewActv.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, -1, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -268,13 +242,12 @@ public class PoliciesTableViewForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-      
-    
+
+
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
 
     }//GEN-LAST:event_formWindowClosing
-        
-       
+
     /**
      * @param args the command line arguments
      */
@@ -305,7 +278,7 @@ public class PoliciesTableViewForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-             //   new UpdateCstmrCrdForm().setVisible(true);
+                //   new UpdateCstmrCrdForm().setVisible(true);
             }
         });
     }
@@ -313,6 +286,7 @@ public class PoliciesTableViewForm extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextPane JTextPanePolicyViewDescription;
     private javax.swing.JPanel SelectWhichNewActv;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JScrollPane jScrollPane1;

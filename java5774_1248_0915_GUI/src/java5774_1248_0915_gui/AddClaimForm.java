@@ -5,12 +5,6 @@
  */
 package java5774_1248_0915_gui;
 
-import MyPackages.Claim;
-import MyPackages.Claim.ClaimStat;
-import MyPackages.Claim.Documents;
-import MyPackages.Claim.EvntType;
-import MyPackages.Policy;
-import DataAccessObject.IBackend_DAO_List_impl;
 import DataAccessObject.Singelton;
 import java.awt.Color;
 import java.awt.TextField;
@@ -23,9 +17,12 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import Packages.Claim;
+import Packages.Claim.ClaimStat;
+import Packages.Claim.Documents;
+import Packages.Claim.EvntType;
 
 /**
- *
  * @author dell
  */
 public class AddClaimForm extends javax.swing.JFrame {
@@ -36,11 +33,11 @@ public class AddClaimForm extends javax.swing.JFrame {
      * Creates new form AddClaim
      */
     private final Runnable enableFotherFormOfClaimMyFunc;
-    private long per_id;
+    private Long per_id;
     private JTable Claimtable;
     private Claim Claim = null;
     private ArrayList<String> receivedDocumnt;
-    private static IBackend_DAO_List_impl sngltn = null;
+    private static DataAccessObject.Controller sngltn = null;
 
     static {
         try {
@@ -50,7 +47,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }
 
-    ;
+    // Ctor
     public AddClaimForm(long PerId, JTable jtableClaim, Runnable myfunc) throws Exception {
         enableFotherFormOfClaimMyFunc = myfunc;
 
@@ -59,10 +56,10 @@ public class AddClaimForm extends javax.swing.JFrame {
         Claimtable = jtableClaim;
         initComponents();
         java.awt.event.WindowEvent MyWindow = null;
-        formWindowOpened(MyWindow);
+        formWindowOpened(MyWindow); // align to center
 
-        ArrayList<Documents> arr = SetReqDucmntsListByEvent(EvntType.Vehicle);
-        try {
+        ArrayList<Documents> arr = (ArrayList<Documents>) SetReqDucmntsListByEvent(EvntType.Vehicle);
+        try { // try to insert the new required documents list and delete the old list
             int counter = 1;
             DefaultTableModel model = (DefaultTableModel) jTableDocumentsRequired.getModel();
             for (Documents doc : arr) {
@@ -92,19 +89,14 @@ public class AddClaimForm extends javax.swing.JFrame {
 
         TextPerson_Name_ID.setEnabled(false);
         TextPerson_Name_ID.setText("Person Name: "
-                + sngltn.GetMyPersonCstmrCrd(per_id).getPer().getPerName() + "\n"
+                + sngltn.GetMyPersonCstmrCrd(per_id).getPerson().getNamePerson() + "\n"
                 + "Preson ID: "
                 + Long.toString(per_id)
         );
-        jSpinnerClaimId.setValue(sngltn.getClaimID()[0]);
-
+        jSpinnerClaimId.setValue(sngltn.getActivityId()[0]);
     }
 
-    /*    private AddClaimForm() {
-     this.receivedDocumnt = new ArrayList<String>();
-     throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-     }
-     */
+    // set the alignment
     private void formWindowOpened(java.awt.event.WindowEvent evt) {
         int lebar = this.getWidth() / 2;
         int tinggi = this.getHeight() / 2;
@@ -411,18 +403,18 @@ public class AddClaimForm extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_EnterDetail0ActionPerformed
 
+    // add the inserted new claim
     private void buttonAddThisClaimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddThisClaimActionPerformed
-        if (!CheckAllInputText(
+        if (!CheckAllInputText( // check all fields filled illigaly
                 ThereIsText(EnterRepresentativeName.getText()),
                 ThereIsText(jSpinnerEventTime.getValue().toString()),
                 EnterDetail0.isVisible() && ThereIsText(EnterDetail0.getText()),
                 !EnterDetail1.isVisible() || (EnterDetail1.isVisible() && ThereIsText(EnterDetail1.getText())),
                 !EnterDetail2.isVisible() || (EnterDetail2.isVisible() && ThereIsText(EnterDetail2.getText())),
                 !EnterDetail3.isVisible() || (EnterDetail3.isVisible() && ThereIsText(EnterDetail3.getText())),
-                ThereIsText(EnterEventPlace.getText())
-        )) {
+                ThereIsText(EnterEventPlace.getText()))) {
             JOptionPane.showMessageDialog(null, "Insert valid values", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if ("Adding the claim".equals(buttonAddThisClaim.getLabel())) {
+        } else if ("Adding the claim".equals(buttonAddThisClaim.getLabel())) { // initilize received documents
             for (int i = 0; i < jTableDocumentsRequired.getRowCount(); i++) {
                 if ((boolean) jTableDocumentsRequired.getValueAt(i, 1)) {
                     receivedDocumnt.add((String) jTableDocumentsRequired.getValueAt(i, 0));
@@ -430,12 +422,11 @@ public class AddClaimForm extends javax.swing.JFrame {
             }
             try {
                 Claim = new Claim(
-                        sngltn.getClaimID(),
                         (ClaimStat) ComboBoxInsuranceClaimStatus.getSelectedItem(),
                         (EvntType) ComboBoxEventType.getSelectedItem(),
                         (Date) jSpinnerEventTime.getValue(),
                         EnterEventPlace.getText(),
-                        receivedDocumnt, //DocumentsReceived
+                        receivedDocumnt,
                         EnterRepresentativeName.getText(),
                         (Date) jSpinnerOpeningDate.getValue(),
                         exsitDetailsToList(EnterDetail0, EnterDetail1, EnterDetail2, EnterDetail3)
@@ -444,15 +435,15 @@ public class AddClaimForm extends javax.swing.JFrame {
                 Logger.getLogger(AddClaimForm.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            try {
-                sngltn.AddNewClaim(Claim, sngltn.GetMyPersonCstmrCrd(per_id).getPer());
+            try { // try to return the claim id the just created
+                jSpinnerClaimId.setValue(sngltn.AddNewClaim(Claim, sngltn.GetMyPersonCstmrCrd(per_id).getPerson()));
             } catch (Exception ex) {
                 Logger.getLogger(AddClaimForm.class.getName()).log(Level.SEVERE, null, ex);
             }
             JOptionPane.showMessageDialog(null, "Adding CustomerCrd.Activity.Claim Successfully", "", JOptionPane.PLAIN_MESSAGE);
             buttonAddThisClaim.setLabel("Update This Claim");
             ComboBoxEventType.setEnabled(false);
-        } else if ("Update This Claim".equals(buttonAddThisClaim.getLabel())) {
+        } else if ("Update This Claim".equals(buttonAddThisClaim.getLabel())) { // update calim details
             Claim = new Claim();
             try {
                 Claim = sngltn.GetClaimById(Long.parseLong(jSpinnerClaimId.getValue().toString()));
@@ -477,7 +468,7 @@ public class AddClaimForm extends javax.swing.JFrame {
             Claim.setMoreDetails(exsitDetailsToList(EnterDetail0, EnterDetail1, EnterDetail2, EnterDetail3));
             Claim.setDocumentsReceived(receivedDocumnt);
             try {
-                sngltn.UpdateClaim(Claim, sngltn.GetMyPersonCstmrCrd(per_id).getPer());
+                sngltn.UpdateClaim(Claim, sngltn.GetMyPersonCstmrCrd(per_id).getPerson());
             } catch (Exception ex) {
                 Logger.getLogger(AddClaimForm.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -485,6 +476,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_buttonAddThisClaimActionPerformed
 
+    // fetures of +/- more details
     private void buttonPlus0ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPlus0ActionPerformed
         EnterDetail0.setVisible(true);
         EnterDetail1.setVisible(true);
@@ -501,6 +493,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         this.setSize(532, 490);
     }//GEN-LAST:event_buttonPlus0ActionPerformed
 
+    // fetures of +/- more details
     private void buttonPlus1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPlus1ActionPerformed
         EnterDetail0.setVisible(true);
         EnterDetail1.setVisible(true);
@@ -520,6 +513,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         this.setSize(532, 530);
     }//GEN-LAST:event_buttonPlus1ActionPerformed
 
+    // fetures of +/- more details
     private void buttonPlus2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonPlus2ActionPerformed
         EnterDetail0.setVisible(true);
         EnterDetail1.setVisible(true);
@@ -540,6 +534,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         this.setSize(532, 570);
     }//GEN-LAST:event_buttonPlus2ActionPerformed
 
+    // fetures of +/- more details
     private void buttonMinus3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMinus3ActionPerformed
         EnterDetail3.setVisible(false);
         buttonPlus0.setVisible(false);
@@ -557,6 +552,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         this.setSize(532, 530);
     }//GEN-LAST:event_buttonMinus3ActionPerformed
 
+    // fetures of +/- more details
     private void buttonMinus2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMinus2ActionPerformed
         EnterDetail3.setVisible(false);
         EnterDetail2.setVisible(false);
@@ -575,6 +571,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         this.setSize(532, 490);
     }//GEN-LAST:event_buttonMinus2ActionPerformed
 
+    // fetures of +/- more details
     private void buttonMinus1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonMinus1ActionPerformed
         EnterDetail3.setVisible(false);
         EnterDetail2.setVisible(false);
@@ -603,19 +600,21 @@ public class AddClaimForm extends javax.swing.JFrame {
 
     }//GEN-LAST:event_formWindowClosed
 
+    // handle closing form window
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         enableFotherFormOfClaimMyFunc.run();
         try {
             DefaultTableModel model = (DefaultTableModel) Claimtable.getModel();
             model.setRowCount(0);
-            for (Claim claim : sngltn.GetPerClaims(sngltn.GetMyPersonCstmrCrd(per_id).getPer())) {
-                model.addRow(new Object[]{String.valueOf(claim.getClaimId()), String.valueOf(claim.getRepresentativeName()), String.valueOf(claim.getInsuranceClaimStatus()), String.valueOf(claim.getEventType()), String.valueOf(claim.getEventTime()), String.valueOf(claim.getEventPlace())});
+            for (Claim claim : sngltn.GetPerClaims(sngltn.GetMyPersonCstmrCrd(per_id).getPerson())) {
+                model.addRow(new Object[]{String.valueOf(claim.getId()), String.valueOf(claim.getRepresentativeName()), String.valueOf(claim.getInsuranceClaimStatus()), String.valueOf(claim.getEventType()), String.valueOf(claim.getEventTime()), String.valueOf(claim.getEventPlace())});
             }
         } catch (Exception ex) {
             Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_formWindowClosing
 
+    // select event type from the combo box
     private void ComboBoxEventTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxEventTypeActionPerformed
         EvntType evntType = (EvntType) ComboBoxEventType.getSelectedItem();
         ArrayList<Documents> arr = SetReqDucmntsListByEvent(evntType);
@@ -630,6 +629,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_ComboBoxEventTypeActionPerformed
 
+    // handle tooltip label
     private void representative_name_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_representative_name_cursor_in_handler
         if (EnterRepresentativeName.getText().equals("Enter Representative Name")) {
             EnterRepresentativeName.setText(null);
@@ -638,6 +638,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_representative_name_cursor_in_handler
 
+    // handle tooltip label
     private void representative_name_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_representative_name_cursor_out_handler
         if (EnterRepresentativeName.getText().length() < 1) {
             EnterRepresentativeName.setText("Enter Representative Name");
@@ -646,6 +647,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_representative_name_cursor_out_handler
 
+    // handle tooltip label
     private void event_place_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_event_place_cursor_in_handler
         if (EnterEventPlace.getText().equals("Enter Place")) {
             EnterEventPlace.setText(null);
@@ -654,6 +656,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_event_place_cursor_in_handler
 
+    // handle tooltip label
     private void event_place_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_event_place_cursor_out_handler
         if (EnterEventPlace.getText().length() < 1) {
             EnterEventPlace.setText("Enter Place");
@@ -662,6 +665,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_event_place_cursor_out_handler
 
+    // handle tooltip label
     private void detail0_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail0_cursor_in_handler
         if (EnterDetail0.getText().equals("Enter Detail")) {
             EnterDetail0.setText(null);
@@ -670,6 +674,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail0_cursor_in_handler
 
+    // handle tooltip label
     private void detail1_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail1_cursor_in_handler
         if (EnterDetail1.getText().equals("Enter Detail")) {
             EnterDetail1.setText(null);
@@ -678,6 +683,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail1_cursor_in_handler
 
+    // handle tooltip label
     private void detail2_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail2_cursor_in_handler
         if (EnterDetail2.getText().equals("Enter Detail")) {
             EnterDetail2.setText(null);
@@ -686,6 +692,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail2_cursor_in_handler
 
+    // handle tooltip label
     private void detail3_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail3_cursor_in_handler
         if (EnterDetail3.getText().equals("Enter Detail")) {
             EnterDetail3.setText(null);
@@ -694,6 +701,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail3_cursor_in_handler
 
+    // handle tooltip label
     private void detail3_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail3_cursor_out_handler
         if (EnterDetail3.getText().length() < 1) {
             EnterDetail3.setText("Enter Detail");
@@ -702,6 +710,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail3_cursor_out_handler
 
+    // handle tooltip label
     private void detail2_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail2_cursor_out_handler
         if (EnterDetail2.getText().length() < 1) {
             EnterDetail2.setText("Enter Detail");
@@ -710,6 +719,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail2_cursor_out_handler
 
+    // handle tooltip label
     private void detail1_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail1_cursor_out_handler
         if (EnterDetail1.getText().length() < 1) {
             EnterDetail1.setText("Enter Detail");
@@ -718,6 +728,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail1_cursor_out_handler
 
+    // handle tooltip label
     private void detail0_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_detail0_cursor_out_handler
         if (EnterDetail0.getText().length() < 1) {
             EnterDetail0.setText("Enter Detail");
@@ -726,6 +737,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_detail0_cursor_out_handler
 
+    // validation of all fields data
     private boolean CheckAllInputText(boolean str1, boolean str2, boolean str3, boolean str4, boolean str5, boolean str6, boolean str7) {
         boolean reslt = true;
         if (str1 == false) {
@@ -780,6 +792,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         return reslt;
     }
 
+    // check if text exist
     private boolean ThereIsText(String str) {
         try {
             int ln = str.length();
@@ -792,6 +805,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         return true;
     }
 
+    // check numeric 
     private static boolean OnlyNumbers(String str) {
         try {
             long l = Long.parseLong(str);
@@ -801,6 +815,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         return true;
     }
 
+    // return list of more details
     private ArrayList<String> exsitDetailsToList(TextField textfield0, TextField textfield1, TextField textfield2, TextField textfield3) {
         ArrayList<String> DetailList = new ArrayList<String>();
         if (textfield0.isVisible() && !"".equals(textfield0.getText())) {
@@ -818,6 +833,7 @@ public class AddClaimForm extends javax.swing.JFrame {
         return DetailList;
     }
 
+    // return required documents by selected event 
     private ArrayList<Claim.Documents> SetReqDucmntsListByEvent(EvntType myevent) //dagan
     {
         ArrayList<Claim.Documents> arr = new ArrayList<Claim.Documents>();

@@ -5,26 +5,23 @@
  */
 package java5774_1248_0915_gui;
 
-import MyPackages.Activity;
-import MyPackages.Person;
-import MyPackages.Policy;
-import DataAccessObject.IBackend_DAO_List_impl;
+import DataAccessObject.Controller;
 import DataAccessObject.Singelton;
-import MyPackages.CustomerCrd;
 import java.awt.Color;
 import java.awt.Toolkit;
-import static java.lang.Integer.parseInt;
 import static java.lang.Long.parseLong;
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
+import Packages.Activity;
+import Packages.CustomerCrd;
+import Packages.Person;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JTable;
 
 /**
- *
  * @author dell
  */
 public class AddCstmrCrdForm extends javax.swing.JFrame {
@@ -39,7 +36,7 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
     private ArrayList<Activity> PerActivities;
     private final Runnable MainFormMyfunc;
 
-    private static IBackend_DAO_List_impl sngltn = null;
+    private static Controller sngltn = null;
 
     static {
         try {
@@ -49,17 +46,17 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
         }
     }
 
-    ;
-        
+    // window for add customer card
     public AddCstmrCrdForm(Runnable myFunc) throws Exception {
         initComponents();
-        All_Tab.setEnabledAt(1, false); //##
+        All_Tab.setEnabledAt(1, false);
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
 
         this.MainFormMyfunc = myFunc;
     }
 
+    // alignment the window
     private void formWindowOpened(java.awt.event.WindowEvent evt) {
         int lebar = this.getWidth() / 2;
         int tinggi = this.getHeight() / 2;
@@ -97,6 +94,7 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
         buttonAddNewPolicy = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTablePolicyView = new javax.swing.JTable();
+        jLabel8 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -286,36 +284,46 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
             jTablePolicyView.getColumnModel().getColumn(5).setPreferredWidth(5);
         }
 
+        jLabel8.setText("Select Policy to Update\\Delete:");
+
         javax.swing.GroupLayout AddNewPolicyLayout = new javax.swing.GroupLayout(AddNewPolicy);
         AddNewPolicy.setLayout(AddNewPolicyLayout);
         AddNewPolicyLayout.setHorizontalGroup(
             AddNewPolicyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(AddNewPolicyLayout.createSequentialGroup()
-                .addGap(92, 92, 92)
-                .addComponent(jLabel5)
                 .addGroup(AddNewPolicyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(AddNewPolicyLayout.createSequentialGroup()
-                        .addGap(134, 134, 134)
-                        .addComponent(buttonAddNewPolicy))
+                        .addGap(92, 92, 92)
+                        .addComponent(jLabel5))
                     .addGroup(AddNewPolicyLayout.createSequentialGroup()
-                        .addGap(73, 73, 73)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap()
+                        .addComponent(jLabel8)))
+                .addGroup(AddNewPolicyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(AddNewPolicyLayout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(AddNewPolicyLayout.createSequentialGroup()
+                        .addGap(77, 77, 77)
+                        .addComponent(buttonAddNewPolicy)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 553, Short.MAX_VALUE)
         );
         AddNewPolicyLayout.setVerticalGroup(
             AddNewPolicyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(AddNewPolicyLayout.createSequentialGroup()
                 .addGroup(AddNewPolicyLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(AddNewPolicyLayout.createSequentialGroup()
-                        .addGap(70, 70, 70)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(AddNewPolicyLayout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
-                        .addComponent(buttonAddNewPolicy)))
-                .addGap(18, 18, 18)
+                        .addComponent(buttonAddNewPolicy)
+                        .addGap(18, 18, 18))
+                    .addGroup(AddNewPolicyLayout.createSequentialGroup()
+                        .addGap(70, 70, 70)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel8)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -337,11 +345,12 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // add a new person
     private void buttonAddPersonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddPersonActionPerformed
         boolean ok = false;
         this.per = null;
         this.cstmr = null;
-        if (!CheckAllInputText(
+        if (!CheckAllInputText( // check all required fields
                 ThereIsText(EnterPerName.getText()),
                 ThereIsText(EnterPerId.getText()) && OnlyNumbers(EnterPerId.getText()),
                 ThereIsText(EnterPerPhone.getText()) && OnlyNumbers(EnterPerPhone.getText()),
@@ -350,10 +359,12 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Insert valid values", "Error", JOptionPane.ERROR_MESSAGE);
         } else if ("Add Person".equals(buttonAddPerson.getLabel())) {
             PerActivities = new ArrayList<Activity>();
+
             per = new Person(EnterPerName.getText(),
                     parseLong(EnterPerId.getText()),
                     parseLong(EnterPerPhone.getText()),
                     EnterPerAddress.getText());
+
             cstmr = new CustomerCrd(per, PerActivities);
             ok = sngltn.AddNewCustomerCrd(cstmr);
             if (ok) {
@@ -362,48 +373,51 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
                 EnterPerId.setEnabled(false);
                 try {
                     PerNameInActivityTab.setText("Person Name: "
-                            + sngltn.GetMyPersonCstmrCrd(per.getPerId()).getPer().getPerName() + "\n"
+                            + sngltn.GetMyPersonCstmrCrd(per.getId()).getPerson().getNamePerson() + "\n"
                             + "Preson ID: "
-                            + Long.toString(per.getPerId())
+                            + Long.toString(per.getId())
                     );
                 } catch (Exception ex) {
                     Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 buttonAddPerson.setLabel("Update This Person");
-                /*    try 
-                 {
-                 DefaultTableModel model=(DefaultTableModel)jTablePolicyView.getModel();
-                 for(Policy policy : sngltn.GetPerPolicies(sngltn.GetMyPersonCstmrCrd(parseLong(EnterPerId.getText())).getPer()))
-                 {
-                 model.addRow(new Object[] {String.valueOf(policy.getPolicyId()),String.valueOf(policy.getOpeningDate()),String.valueOf(policy.getRepresentativeName()),String.valueOf(policy.getPolicyType()),String.valueOf(policy.getInsuranceCompany()),policy.getPolicyRate()});
-                 }                           
-                 } catch (Exception ex) {
-                 Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                 }*/
             } else {
                 JOptionPane.showMessageDialog(null, "This client is already exist", "", JOptionPane.INFORMATION_MESSAGE);
             }
         } else {
+
             try {
                 cstmr = sngltn.GetMyPersonCstmrCrd(parseLong(EnterPerId.getText()));
             } catch (Exception ex) {
                 Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
             }
 
-            per = cstmr.getPer();
-            per.setPerName(EnterPerName.getText());
-            per.setPerPhon(parseLong(EnterPerPhone.getText()));
-            per.setPerAddress(EnterPerAddress.getText());
-            cstmr.setPer(per);
-            sngltn.UpdateCustomerCrd(cstmr);
+            per = cstmr.getPerson();
+            per.setNamePerson(EnterPerName.getText());
+            per.setPhonePerson(parseLong(EnterPerPhone.getText()));
+            per.setAddressPerson(EnterPerAddress.getText());
+            cstmr.setPerson(per);
+            try {
+                sngltn.UpdateCustomerCrd(cstmr);
+            } catch (Exception ex) {
+                Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
             JOptionPane.showMessageDialog(null, "Update Preson Successfully", "", JOptionPane.PLAIN_MESSAGE);
-            PerNameInActivityTab.setText(per.getPerName());
+            try {
+                PerNameInActivityTab.setText("Person Name: "
+                        + sngltn.GetMyPersonCstmrCrd(per.getId()).getPerson().getNamePerson() + "\n"
+                        + "Preson ID: "
+                        + Long.toString(per.getId()));
+            } catch (Exception ex) {
+                Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_buttonAddPersonActionPerformed
 
+    // add new policy 
     private void buttonAddNewPolicyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonAddNewPolicyActionPerformed
         AddPolicyForm AddPolicy = null;
-        try {
+        try { // able this window when the add policy form is close and update the jTablePolicyView
             AddPolicy = new AddPolicyForm(parseLong(EnterPerId.getText()), this.jTablePolicyView,
                     new Runnable() {
                         @Override
@@ -422,12 +436,31 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
         setEnabled(false);
         AddPolicy.show();
 
+        jTablePolicyView.addMouseListener(new MouseAdapter() { // mouse handler
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 1) {
+                    JTable target = (JTable) e.getSource();
+                    int row = target.getSelectedRow();
+                    int column = target.getSelectedColumn();
+
+                    DeleteOrUpdateSelectForm deletOrUp = null;
+                    try {
+                        deletOrUp = new DeleteOrUpdateSelectForm("p", parseLong(EnterPerId.getText()), jTablePolicyView.getValueAt(row, 0), jTablePolicyView);
+                    } catch (Exception ex) {
+                        Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    deletOrUp.show();
+                }
+            }
+        });
     }//GEN-LAST:event_buttonAddNewPolicyActionPerformed
 
+    // closing the window event
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         MainFormMyfunc.run();
     }//GEN-LAST:event_formWindowClosing
 
+    // handle tooltip label
     private void person_name_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_name_cursor_in_handler
         if (EnterPerName.getText().equals("Enter Name")) {
             EnterPerName.setText(null);
@@ -436,14 +469,16 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_person_name_cursor_in_handler
 
+    // handle tooltip label
     private void person_name_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_name_cursor_out_handler
-        if(EnterPerName.getText().length() < 1){
-           EnterPerName.setText("Enter Name");
-           EnterPerName.setFont(new java.awt.Font("Tahoma", 2, 11));
-           EnterPerName.setForeground(new java.awt.Color(153, 153, 153));
+        if (EnterPerName.getText().length() < 1) {
+            EnterPerName.setText("Enter Name");
+            EnterPerName.setFont(new java.awt.Font("Tahoma", 2, 11));
+            EnterPerName.setForeground(new java.awt.Color(153, 153, 153));
         }
     }//GEN-LAST:event_person_name_cursor_out_handler
 
+    // handle tooltip label
     private void person_id_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_id_cursor_in_handler
         if (EnterPerId.getText().equals("Enter Per ID")) {
             EnterPerId.setText(null);
@@ -452,14 +487,16 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_person_id_cursor_in_handler
 
+    // handle tooltip label
     private void person_id_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_id_cursor_out_handler
-        if(EnterPerId.getText().length() < 1){
-           EnterPerId.setText("Enter Per ID");
-           EnterPerId.setFont(new java.awt.Font("Tahoma", 2, 11));
-           EnterPerId.setForeground(new java.awt.Color(153, 153, 153));
+        if (EnterPerId.getText().length() < 1) {
+            EnterPerId.setText("Enter Per ID");
+            EnterPerId.setFont(new java.awt.Font("Tahoma", 2, 11));
+            EnterPerId.setForeground(new java.awt.Color(153, 153, 153));
         }
     }//GEN-LAST:event_person_id_cursor_out_handler
 
+    // handle tooltip label
     private void person_phone_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_phone_cursor_in_handler
         if (EnterPerPhone.getText().equals("Enter Phone")) {
             EnterPerPhone.setText(null);
@@ -468,14 +505,16 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_person_phone_cursor_in_handler
 
+    // handle tooltip label
     private void person_phone_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_phone_cursor_out_handler
-        if(EnterPerPhone.getText().length() < 1){
-           EnterPerPhone.setText("Enter Phone");
-           EnterPerPhone.setFont(new java.awt.Font("Tahoma", 2, 11));
-           EnterPerPhone.setForeground(new java.awt.Color(153, 153, 153));
+        if (EnterPerPhone.getText().length() < 1) {
+            EnterPerPhone.setText("Enter Phone");
+            EnterPerPhone.setFont(new java.awt.Font("Tahoma", 2, 11));
+            EnterPerPhone.setForeground(new java.awt.Color(153, 153, 153));
         }
     }//GEN-LAST:event_person_phone_cursor_out_handler
 
+    // handle tooltip label
     private void person_address_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_address_cursor_in_handler
         if (EnterPerAddress.getText().equals("Enter Address")) {
             EnterPerAddress.setText(null);
@@ -484,14 +523,16 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_person_address_cursor_in_handler
 
+    // handle tooltip label
     private void person_address_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_address_cursor_out_handler
-        if(EnterPerAddress.getText().length() < 1){
-           EnterPerAddress.setText("Enter Address");
-           EnterPerAddress.setFont(new java.awt.Font("Tahoma", 2, 11));
-           EnterPerAddress.setForeground(new java.awt.Color(153, 153, 153));
+        if (EnterPerAddress.getText().length() < 1) {
+            EnterPerAddress.setText("Enter Address");
+            EnterPerAddress.setFont(new java.awt.Font("Tahoma", 2, 11));
+            EnterPerAddress.setForeground(new java.awt.Color(153, 153, 153));
         }
     }//GEN-LAST:event_person_address_cursor_out_handler
 
+    // check numeric
     private static boolean OnlyNumbers(String str) {
         try {
             long l = Long.parseLong(str);
@@ -501,6 +542,7 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
         return true;
     }
 
+    // check if there is text in field
     private boolean ThereIsText(String str) {
         try {
             int ln = str.length();
@@ -513,6 +555,7 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
         return true;
     }
 
+    // validation of fields data
     private boolean CheckAllInputText(boolean str1, boolean str2, boolean str3, boolean str4) {
         boolean reslt = true;
         if (!str1) {
@@ -601,6 +644,7 @@ public class AddCstmrCrdForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTablePolicyView;

@@ -3,14 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package java5774_1248_0915_gui;
 
-import MyPackages.Claim;
-import MyPackages.Claim.ClaimStat;
-import MyPackages.Claim.Documents;
-import MyPackages.Claim.EvntType;
-import DataAccessObject.IBackend_DAO_List_impl;
+import DataAccessObject.Controller;
 import DataAccessObject.Singelton;
 import java.awt.Toolkit;
 import java.util.ArrayList;
@@ -19,12 +14,16 @@ import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import Packages.Claim;
+import Packages.Claim.ClaimStat;
+import Packages.Claim.Documents;
+import Packages.Claim.EvntType;
 
 /**
- *
  * @author dell
  */
 public class JustViewClaimForm extends javax.swing.JFrame {
+
     private static final long serialVersionUID = 1L;
 
     /**
@@ -33,49 +32,50 @@ public class JustViewClaimForm extends javax.swing.JFrame {
     private long per_id;
     private long claim_id;
     private ArrayList<String> receivedDocumnt;
-    
-    private Claim claim=null;
-    
-    private static IBackend_DAO_List_impl sngltn = null;
-    static {
-                try 
-                {
-                sngltn=Singelton.getMySingelton();
-                } 
-                catch (Exception ex) 
-                {
-                    Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            };
-    
-    public JustViewClaimForm(long PerId,Object ClaimID) throws Exception {
-        this.receivedDocumnt = new ArrayList<String>();
-        
-        per_id=PerId;
-        claim_id=Long.valueOf(ClaimID.toString());
 
-        claim =new Claim();
-        claim=sngltn.GetClaimById(claim_id);
-        
-        int NumOfDetails=claim.getMoreDetails().size();
-        
+    private Claim claim = null;
+
+    private static Controller sngltn = null;
+
+    static {
+        try {
+            sngltn = Singelton.getMySingelton();
+        } catch (Exception ex) {
+            Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    ;
+    
+    // Ctor
+    public JustViewClaimForm(long PerId, Object ClaimID) throws Exception {
+        this.receivedDocumnt = new ArrayList<String>();
+
+        per_id = PerId;
+        claim_id = Long.valueOf(ClaimID.toString());
+
+        claim = new Claim();
+        claim = sngltn.GetClaimById(claim_id);
+
+        int NumOfDetails = claim.getMoreDetailsSize();
+
         initComponents();
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
-        
-        ArrayList<Documents> arr=SetReqDucmntsListByEvent(claim.getEventType());
-        
+
+        ArrayList<Documents> arr = SetReqDucmntsListByEvent(claim.getEventType());
+
         ComboBoxEventType.setModel(new DefaultComboBoxModel(EvntType.values()));
         ComboBoxInsuranceClaimStatus.setModel(new DefaultComboBoxModel(ClaimStat.values()));
-        
+
         DetailsFieldsFirstDesplay(NumOfDetails);
-        
+
         TextPerson_Name_ID.setEnabled(false);
-        TextPerson_Name_ID.setText("Person Name: "+ 
-                                    sngltn.GetMyPersonCstmrCrd(per_id).getPer().getPerName() + "\n"+
-                                    "Preson ID: "+
-                                    Long.toString(per_id)
-                                    );
+        TextPerson_Name_ID.setText("Person Name: "
+                + sngltn.GetMyPersonCstmrCrd(per_id).getPerson().getNamePerson() + "\n"
+                + "Preson ID: "
+                + Long.toString(per_id)
+        );
         EnterRepresentativeName.setText(claim.getRepresentativeName());
         jSpinnerClaimId.setValue(claim_id);
         ComboBoxInsuranceClaimStatus.setSelectedItem(claim.getInsuranceClaimStatus());
@@ -83,64 +83,54 @@ public class JustViewClaimForm extends javax.swing.JFrame {
         ComboBoxEventType.setSelectedItem(claim.getEventType());
         jSpinnerEventTime.setValue(claim.getEventTime());
         EnterEventPlace.setText(claim.getEventPlace());
-        if (NumOfDetails==1)
-                                    EnterDetail0.setText(claim.getMoreDetails().get(0));
-        else if (NumOfDetails==2)
-                                {
-                                    EnterDetail0.setText(claim.getMoreDetails().get(0));
-                                    EnterDetail1.setText(claim.getMoreDetails().get(1));
-                                }
-        else if (NumOfDetails==3)
-                                {
-                                    EnterDetail0.setText(claim.getMoreDetails().get(0));
-                                    EnterDetail1.setText(claim.getMoreDetails().get(1));
-                                    EnterDetail2.setText(claim.getMoreDetails().get(2));
-                                }
-         else if (NumOfDetails==4)
-                                {
-                                    EnterDetail0.setText(claim.getMoreDetails().get(0));
-                                    EnterDetail1.setText(claim.getMoreDetails().get(1));
-                                    EnterDetail2.setText(claim.getMoreDetails().get(2));
-                                    EnterDetail3.setText(claim.getMoreDetails().get(3));
-                                }
-        try 
-        {
-            DefaultTableModel model=(DefaultTableModel)jTableDocumentsRequired.getModel();
-            model.setRowCount(0);
-            for(Documents doc : arr)
-            {
-                model.addRow(new Object[] {String.valueOf(doc),false});
-            }                           
+        if (NumOfDetails == 1) {
+            EnterDetail0.setText(claim.getMoreDetailsValues().get(0));
+        } else if (NumOfDetails == 2) {
+            EnterDetail0.setText(claim.getMoreDetailsValues().get(0));
+            EnterDetail1.setText(claim.getMoreDetailsValues().get(1));
+        } else if (NumOfDetails == 3) {
+            EnterDetail0.setText(claim.getMoreDetailsValues().get(0));
+            EnterDetail1.setText(claim.getMoreDetailsValues().get(1));
+            EnterDetail2.setText(claim.getMoreDetailsValues().get(2));
+        } else if (NumOfDetails == 4) {
+            EnterDetail0.setText(claim.getMoreDetailsValues().get(0));
+            EnterDetail1.setText(claim.getMoreDetailsValues().get(1));
+            EnterDetail2.setText(claim.getMoreDetailsValues().get(2));
+            EnterDetail3.setText(claim.getMoreDetailsValues().get(3));
         }
-        catch (Exception ex) 
-        {
+        try {
+            DefaultTableModel model = (DefaultTableModel) jTableDocumentsRequired.getModel();
+            model.setRowCount(0);
+            for (Documents doc : arr) {
+                model.addRow(new Object[]{String.valueOf(doc), false});
+            }
+        } catch (Exception ex) {
             Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        for(int i=0;i<jTableDocumentsRequired.getRowCount();i++)
-        {
-            for (String doc :claim.getDocumentsReceived())
-            {   
-                if(jTableDocumentsRequired.getValueAt(i, 0).toString().equals(doc))
-                jTableDocumentsRequired.setValueAt(true,i, 1);
+
+        for (int i = 0; i < jTableDocumentsRequired.getRowCount(); i++) {
+            for (String doc : claim.getDocumentsReceivedValues()) {
+                if (jTableDocumentsRequired.getValueAt(i, 0).toString().equals(doc)) {
+                    jTableDocumentsRequired.setValueAt(true, i, 1);
+                }
             }
         }
-        
-       
     }
 
 //    private JustViewClaimForm() {
 //        this.receivedDocumnt = new ArrayList<String>();
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //    }
-  
-     private void formWindowOpened(java.awt.event.WindowEvent evt) {                                  
-        int lebar = this.getWidth()/2;
-        int tinggi = this.getHeight()/2;
-        int x = (Toolkit.getDefaultToolkit().getScreenSize().width/2)-lebar;
-        int y = (Toolkit.getDefaultToolkit().getScreenSize().height/2)-tinggi;
+    
+    // alignment the window
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {
+        int lebar = this.getWidth() / 2;
+        int tinggi = this.getHeight() / 2;
+        int x = (Toolkit.getDefaultToolkit().getScreenSize().width / 2) - lebar;
+        int y = (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - tinggi;
         this.setLocation(x, y);
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -343,103 +333,84 @@ public class JustViewClaimForm extends javax.swing.JFrame {
     }//GEN-LAST:event_EnterDetail1ActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-                                    
+
     }//GEN-LAST:event_formWindowClosed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-       
+
     }//GEN-LAST:event_formWindowClosing
 
+    // choosing event type from combo box
     private void ComboBoxEventTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboBoxEventTypeActionPerformed
-        EvntType evntType=(EvntType)ComboBoxEventType.getSelectedItem();
-        ArrayList<Documents> arr=SetReqDucmntsListByEvent(evntType);
-        try 
-        {
-            int counter=1;
-            DefaultTableModel model=(DefaultTableModel)jTableDocumentsRequired.getModel();
+        EvntType evntType = (EvntType) ComboBoxEventType.getSelectedItem();
+        ArrayList<Documents> arr = SetReqDucmntsListByEvent(evntType);
+        try {
+            int counter = 1;
+            DefaultTableModel model = (DefaultTableModel) jTableDocumentsRequired.getModel();
             model.setRowCount(0);
-            for(Documents doc : arr)
-            {
-                model.addRow(new Object[] {String.valueOf(doc),false});
-            }                           
-        }
-        catch (Exception ex) 
-        {
+            for (Documents doc : arr) {
+                model.addRow(new Object[]{String.valueOf(doc), false});
+            }
+        } catch (Exception ex) {
             Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_ComboBoxEventTypeActionPerformed
-         
-        
-        private ArrayList<Claim.Documents> SetReqDucmntsListByEvent(EvntType myevent) //dagan
-        {
-            ArrayList<Claim.Documents> arr=new ArrayList<Claim.Documents>();
-            if (myevent.equals(EvntType.Vehicle))
-            {
-                arr.add(Documents.IDPhoto);
-                arr.add(Documents.VehicleLicense);
-                arr.add(Documents.DriverLicense);
-                arr.add(Documents.ReferenceAppraisers);
-                arr.add(Documents.MedicalReview);
-            }
-            else if (myevent.equals(EvntType.Health))
-            {
-                arr.add(Documents.IDPhoto);
-                arr.add(Documents.ConsentForm);
-                arr.add(Documents.MedicalReview);
-            }
-            else if (myevent.equals(EvntType.Personally))
-            {
-                arr.add(Documents.IDPhoto);
-                arr.add(Documents.ConsentForm);
-                arr.add(Documents.MedicalReview);
-                arr.add(Documents.GeneralReference);
-            }
-            else if (myevent.equals(EvntType.Work))
-            {
-                arr.add(Documents.IDPhoto);
-                arr.add(Documents.ConsentForm);
-                arr.add(Documents.MedicalReview);
-                arr.add(Documents.GeneralReference);
-                arr.add(Documents.ReferenceFromEmployer);
-            }
-            return arr;
+
+    // set required documents by the event
+    private ArrayList<Claim.Documents> SetReqDucmntsListByEvent(EvntType myevent)
+    {
+        ArrayList<Claim.Documents> arr = new ArrayList<Claim.Documents>();
+        if (myevent.equals(EvntType.Vehicle)) {
+            arr.add(Documents.IDPhoto);
+            arr.add(Documents.VehicleLicense);
+            arr.add(Documents.DriverLicense);
+            arr.add(Documents.ReferenceAppraisers);
+            arr.add(Documents.MedicalReview);
+        } else if (myevent.equals(EvntType.Health)) {
+            arr.add(Documents.IDPhoto);
+            arr.add(Documents.ConsentForm);
+            arr.add(Documents.MedicalReview);
+        } else if (myevent.equals(EvntType.Personally)) {
+            arr.add(Documents.IDPhoto);
+            arr.add(Documents.ConsentForm);
+            arr.add(Documents.MedicalReview);
+            arr.add(Documents.GeneralReference);
+        } else if (myevent.equals(EvntType.Work)) {
+            arr.add(Documents.IDPhoto);
+            arr.add(Documents.ConsentForm);
+            arr.add(Documents.MedicalReview);
+            arr.add(Documents.GeneralReference);
+            arr.add(Documents.ReferenceFromEmployer);
         }
-        
-        private void DetailsFieldsFirstDesplay(int list_lentgh)
-        {
-            if (list_lentgh==1)
-                          {
-                            EnterDetail0.setVisible(true);
-                            EnterDetail1.setVisible(false);
-                            EnterDetail2.setVisible(false);
-                            EnterDetail3.setVisible(false);
-                            this.setSize(531, 450);
-                          }
-        else if (list_lentgh==2)
-                                {
-                                  EnterDetail0.setVisible(true);
-                                  EnterDetail1.setVisible(true);
-                                  this.setSize(531, 490);
-                                }
-        
-        else if (list_lentgh==3)
-                                {
-                                EnterDetail0.setVisible(true);
-                                EnterDetail1.setVisible(true);
-                                EnterDetail2.setVisible(true);
-                                this.setSize(531, 530);
-                                }
-        else if (list_lentgh==4)
-                                {
-                                 EnterDetail0.setVisible(true);
-                                 EnterDetail1.setVisible(true);
-                                 EnterDetail2.setVisible(true);
-                                 EnterDetail3.setVisible(true);  
-                                 this.setSize(531, 570);
-                                }
-        
+        return arr;
+    }
+
+    // fill the "more details" fields accordimg the exists
+    private void DetailsFieldsFirstDesplay(int list_lentgh) {
+        if (list_lentgh == 1) {
+            EnterDetail0.setVisible(true);
+            EnterDetail1.setVisible(false);
+            EnterDetail2.setVisible(false);
+            EnterDetail3.setVisible(false);
+            this.setSize(531, 450);
+        } else if (list_lentgh == 2) {
+            EnterDetail0.setVisible(true);
+            EnterDetail1.setVisible(true);
+            this.setSize(531, 490);
+        } else if (list_lentgh == 3) {
+            EnterDetail0.setVisible(true);
+            EnterDetail1.setVisible(true);
+            EnterDetail2.setVisible(true);
+            this.setSize(531, 530);
+        } else if (list_lentgh == 4) {
+            EnterDetail0.setVisible(true);
+            EnterDetail1.setVisible(true);
+            EnterDetail2.setVisible(true);
+            EnterDetail3.setVisible(true);
+            this.setSize(531, 570);
         }
-        
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -470,7 +441,7 @@ public class JustViewClaimForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-             //   new JustViewClaimForm().setVisible(true);
+                //   new JustViewClaimForm().setVisible(true);
             }
         });
     }

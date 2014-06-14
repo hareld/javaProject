@@ -3,51 +3,49 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package java5774_1248_0915_gui;
 
-import MyPackages.Activity;
-import MyPackages.Claim;
-import MyPackages.Person;
-import MyPackages.Policy;
-import DataAccessObject.IBackend_DAO_List_impl;
+import DataAccessObject.Controller;
 import DataAccessObject.Singelton;
-import MyPackages.CustomerCrd;
 import java.awt.Toolkit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import Packages.Activity;
+import Packages.Claim;
+import Packages.CustomerCrd;
+import Packages.Person;
+import Packages.Policy;
 
 /**
- *
  * @author dell
  */
 public class DeleteOrUpdateSelectForm extends javax.swing.JFrame {
+
     private String PoC;
     private long per_id;
     private JTable Activity_table;
-    private Object Activity_id=null; 
-    private static IBackend_DAO_List_impl sngltn = null;
+    private Object Activity_id = null;
+    private static Controller sngltn = null;
+
     static {
-                try 
-                {
-                sngltn=Singelton.getMySingelton();
-                } 
-                catch (Exception ex) 
-                {
-                    Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            };
-    /**
-     * Creates new form DeleteOrUpdateSelectForm
-     */
-    public DeleteOrUpdateSelectForm(String pORc,long PerId,Object actID,JTable actTable) {
-        PoC=pORc;
-        per_id=PerId;
-        Activity_id=actID;
-        Activity_table=actTable;
+        try {
+            sngltn = Singelton.getMySingelton();
+        } catch (Exception ex) {
+            Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    ;
+    
+    // Ctor
+    public DeleteOrUpdateSelectForm(String pORc, long PerId, Object actID, JTable actTable) {
+        PoC = pORc;
+        per_id = PerId;
+        Activity_id = actID;
+        Activity_table = actTable;
         initComponents();
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
@@ -117,203 +115,160 @@ public class DeleteOrUpdateSelectForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    // choosing update claim or policy
     private void jButtonUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonUpdateActionPerformed
         if (PoC.equalsIgnoreCase("P")) // FOR POLICY
         {
-                  JustUpdatePolicyForm JustUpPolicyFOrm= null;
-                    try
-                    {
-                      JustUpPolicyFOrm = new  JustUpdatePolicyForm(per_id,Activity_id,Activity_table);
-                    }
-                    catch (Exception ex) 
-                    {
-                        Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    JustUpPolicyFOrm .show();
-                    this.setVisible(false);
-        }
-        
-        else if (PoC.equalsIgnoreCase("C")) // FOR CLAIM
+            JustUpdatePolicyForm JustUpPolicyFOrm = null;
+            try {
+                JustUpPolicyFOrm = new JustUpdatePolicyForm(per_id, Activity_id, Activity_table);
+            } catch (Exception ex) {
+                Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            JustUpPolicyFOrm.show();
+            this.setVisible(false);
+        } else if (PoC.equalsIgnoreCase("C")) // FOR CLAIM
         {
-            JustUpdateClaimForm JustUpCalimFOrm= null;
-                    try
-                    {
-                      JustUpCalimFOrm = new  JustUpdateClaimForm(per_id,Activity_id,Activity_table);
-                    }
-                    catch (Exception ex) 
-                    {
-                        Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    JustUpCalimFOrm.show();
-                    this.setVisible(false);
+            JustUpdateClaimForm JustUpCalimFOrm = null;
+            try {
+                JustUpCalimFOrm = new JustUpdateClaimForm(per_id, Activity_id, Activity_table);
+            } catch (Exception ex) {
+                Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            JustUpCalimFOrm.show();
+            this.setVisible(false);
         }
     }//GEN-LAST:event_jButtonUpdateActionPerformed
 
+    // choosing delete claim or policy
     private void jButtonDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDeleteActionPerformed
-         if (PoC.equalsIgnoreCase("P")) // FOR POLICY
+        if (PoC.equalsIgnoreCase("P")) // FOR POLICY
         {
-            int code=JOptionPane.showConfirmDialog(null, "NOTE! You are about to delete this policy! \n" +
-                                                    "Is this what you wanted to do?", "",JOptionPane.YES_NO_OPTION);
-            if (code==JOptionPane.OK_OPTION)
-                {
-                     Person person = null;
-                     Policy policy = null;
-                    try 
-                    {
-                        person=sngltn.GetMyPersonCstmrCrd(per_id).getPer();
-                    }
-                    catch (Exception ex) 
-                    {
-                        Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-              
-                    try 
-                    {
-                        policy=sngltn.GetPolicyById(Long.valueOf(Activity_id.toString()));
-                    } 
-                    catch (Exception ex) 
-                    {
-                        Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    
-                    try 
-                    {                    
-                        if( Activity_table.getRowCount()==1 && sngltn.GetPerClaims(getPerByPerId(getPerIdByPolicyId(Long.valueOf(Activity_table.getValueAt(0, Activity_table.getSelectedRow()).toString())))).size()>0)
-                        {
-                            JOptionPane.showConfirmDialog(null, "You Can't delete all policies when claims are exist in your database.", "",JOptionPane.PLAIN_MESSAGE);
-                        }
-                        else if(sngltn.DeletePolicy(policy,person))
-                        { 
-                            JOptionPane.showMessageDialog(null, "Delete Policy Successfully", "",JOptionPane.PLAIN_MESSAGE);
-                            setVisible(false);
-                            try 
-                            {
-                                int counter=1;
-                                DefaultTableModel model1=(DefaultTableModel)Activity_table.getModel();
-                                model1.setRowCount(0);
-                                for(Policy mypolicy : sngltn.GetPerPolicies(person))
-                                {
-                                    model1.addRow(new Object[] {String.valueOf(mypolicy.getPolicyId()),String.valueOf(mypolicy.getOpeningDate()),String.valueOf(mypolicy.getRepresentativeName()),String.valueOf(mypolicy.getPolicyType()),String.valueOf(mypolicy.getInsuranceCompany()),mypolicy.getPolicyRate()});
-                                }                           
-                            }
-                            catch (Exception ex) 
-                            {
-                                Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                    } 
-                    catch (Exception ex) 
-                    {
-                        Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+            int code = JOptionPane.showConfirmDialog(null, "NOTE! You are about to delete this policy! \n"
+                    + "Is this what you wanted to do?", "", JOptionPane.YES_NO_OPTION);
+            if (code == JOptionPane.OK_OPTION) {
+                Person person = null;
+                Policy policy = null;
+                try {
+                    person = sngltn.GetMyPersonCstmrCrd(per_id).getPerson();
+                } catch (Exception ex) {
+                    Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
                 }
-            else
-            {};
-        }
-        
-        else if (PoC.equalsIgnoreCase("C")) // FOR CLAIM
-        {
-            Claim.ClaimStat myClaimStat = null;
-             try 
-             {
-                 myClaimStat = sngltn.GetClaimById(Long.valueOf((Activity_id).toString())).getInsuranceClaimStatus();
-             } 
-             catch (Exception ex) 
-             {
-                 Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
-             }
-            if (myClaimStat.toString()=="Treatment" || myClaimStat.toString()=="SeeInMoreDetails" )
-                JOptionPane.showMessageDialog(null, "Sorry, You can delete only Confirmed claims or deferred claims, \n "
-                                                    +"And the status of these claims is not one of them...", "",JOptionPane.PLAIN_MESSAGE);
-            else
-            { 
-                int code=JOptionPane.showConfirmDialog(null, "NOTE! You are about to delete this claim! \n" +
-                                                     "Is this what you wanted to do?", "",JOptionPane.YES_NO_OPTION);
-                if (code==JOptionPane.OK_OPTION)
-                {
-                    Person person = null;
-                    Claim claim = null;
-                    try 
-                    {
-                        person=sngltn.GetMyPersonCstmrCrd(per_id).getPer();
-                    }
-                    catch (Exception ex) 
-                    {
-                        Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-              
-                    try 
-                    {
-                        claim=sngltn.GetClaimById(Long.valueOf(Activity_id.toString()));
-                    } 
-                    catch (Exception ex) 
-                    {
-                        Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    
-                    if(sngltn.DeleteClaim(claim,person))
-                    { 
-                        JOptionPane.showMessageDialog(null, "Delete Claim Successfully", "",JOptionPane.PLAIN_MESSAGE);
+
+                try {
+                    policy = sngltn.GetPolicyById(Long.valueOf(Activity_id.toString()));
+                } catch (Exception ex) {
+                    Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                try {
+                    if (Activity_table.getRowCount() == 1 && sngltn.GetPerClaims(getPerByPerId(getPerIdByPolicyId(Long.valueOf(Activity_table.getValueAt(0, Activity_table.getSelectedRow()).toString())))).size() > 0) {
+                        JOptionPane.showConfirmDialog(null, "You Can't delete all policies when claims are exist in your database.", "", JOptionPane.PLAIN_MESSAGE);
+                    } else if (sngltn.DeletePolicy(policy, person)) {
+                        JOptionPane.showMessageDialog(null, "Delete Policy Successfully", "", JOptionPane.PLAIN_MESSAGE);
                         setVisible(false);
-                        try 
-                        {
-                            int counter=1;
-                            DefaultTableModel model2=(DefaultTableModel)Activity_table.getModel();
-                            model2.setRowCount(0);
-                            for(Claim myclaim : sngltn.GetPerClaims(person))
-                            {
-                                model2.addRow(new Object[] {String.valueOf(myclaim.getClaimId()),String.valueOf(myclaim.getRepresentativeName()),String.valueOf(myclaim.getInsuranceClaimStatus()),String.valueOf(myclaim.getEventType()),String.valueOf(myclaim.getEventTime()),String.valueOf(myclaim.getEventPlace())});
-                            }                           
-                        }
-                        catch (Exception ex) 
-                        {
+                        try {
+                            int counter = 1;
+                            DefaultTableModel model1 = (DefaultTableModel) Activity_table.getModel();
+                            model1.setRowCount(0);
+                            for (Policy mypolicy : sngltn.GetPerPolicies(person)) {
+                                model1.addRow(new Object[]{String.valueOf(mypolicy.getId()), String.valueOf(mypolicy.getOpeningDate()), String.valueOf(mypolicy.getRepresentativeName()), String.valueOf(mypolicy.getPolicyType()), String.valueOf(mypolicy.getInsuranceCompany()), mypolicy.getPolicyRate()});
+                            }
+                        } catch (Exception ex) {
                             Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
+                } catch (Exception ex) {
+                    Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-                else
-                {};
+            } else {
+            };
+        } else if (PoC.equalsIgnoreCase("C")) // FOR CLAIM
+        {
+            Claim.ClaimStat myClaimStat = null;
+            try {
+                myClaimStat = sngltn.GetClaimById(Long.valueOf((Activity_id).toString())).getInsuranceClaimStatus();
+            } catch (Exception ex) {
+                Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            if (myClaimStat.toString() == "Treatment" || myClaimStat.toString() == "SeeInMoreDetails") {
+                JOptionPane.showMessageDialog(null, "Sorry, You can delete only Confirmed claims or deferred claims, \n "
+                        + "And the status of these claims is not one of them...", "", JOptionPane.PLAIN_MESSAGE);
+            } else {
+                int code = JOptionPane.showConfirmDialog(null, "NOTE! You are about to delete this claim! \n"
+                        + "Is this what you wanted to do?", "", JOptionPane.YES_NO_OPTION);
+                if (code == JOptionPane.OK_OPTION) {
+                    Person person = null;
+                    Claim claim = null;
+                    try {
+                        person = sngltn.GetMyPersonCstmrCrd(per_id).getPerson();
+                    } catch (Exception ex) {
+                        Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                    try {
+                        claim = sngltn.GetClaimById(Long.valueOf(Activity_id.toString()));
+                    } catch (Exception ex) {
+                        Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    try {
+                        if (sngltn.DeleteClaim(claim, person)) {
+                            JOptionPane.showMessageDialog(null, "Delete Claim Successfully", "", JOptionPane.PLAIN_MESSAGE);
+                            setVisible(false);
+                            try {
+                                int counter = 1;
+                                DefaultTableModel model2 = (DefaultTableModel) Activity_table.getModel();
+                                model2.setRowCount(0);
+                                for (Claim myclaim : sngltn.GetPerClaims(person)) {
+                                    model2.addRow(new Object[]{String.valueOf(myclaim.getId()), String.valueOf(myclaim.getRepresentativeName()), String.valueOf(myclaim.getInsuranceClaimStatus()), String.valueOf(myclaim.getEventType()), String.valueOf(myclaim.getEventTime()), String.valueOf(myclaim.getEventPlace())});
+                                }
+                            } catch (Exception ex) {
+                                Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        Logger.getLogger(DeleteOrUpdateSelectForm.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } else {
+                };
             }
         }
     }//GEN-LAST:event_jButtonDeleteActionPerformed
 
-     private void formWindowOpened(java.awt.event.WindowEvent evt) {                                  
-        int lebar = this.getWidth()/2;
-        int tinggi = this.getHeight()/2;
-        int x = (Toolkit.getDefaultToolkit().getScreenSize().width/2)-lebar;
-        int y = (Toolkit.getDefaultToolkit().getScreenSize().height/2)-tinggi;
+    // aligment the window
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {
+        int lebar = this.getWidth() / 2;
+        int tinggi = this.getHeight() / 2;
+        int x = (Toolkit.getDefaultToolkit().getScreenSize().width / 2) - lebar;
+        int y = (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - tinggi;
         this.setLocation(x, y);
     }
-     
-    private long getPerIdByPolicyId(long policyId) throws Exception
-     {
-      for (CustomerCrd cstmr :sngltn.GetAllCustemers())
-        {
-          for (Activity act:cstmr.getPerActivities())
-          {
-              if (act instanceof Policy)
-              {
-                  Policy plcy=(Policy)act;
-                  if (plcy.getPolicyId()==policyId)
-                      return cstmr.getPer().getPerId();
-              }
-          }
+
+    // get the person id by the policy id of the customer card
+    private long getPerIdByPolicyId(long policyId) throws Exception {
+        for (CustomerCrd cstmr : sngltn.GetAllCustemers()) {
+            for (Activity act : cstmr.getActivities()) {
+                if (act instanceof Policy) {
+                    Policy plcy = (Policy) act;
+                    if (plcy.getId() == policyId) {
+                        return cstmr.getPerson().getId();
+                    }
+                }
+            }
         }
         return 0;
-     } 
-    
-    private Person getPerByPerId(long personId) throws Exception
-     {
-      for (CustomerCrd cstmr :sngltn.GetAllCustemers())
-        {
-              if (cstmr.getPer().getPerId()==personId)
-              {
-                      return cstmr.getPer();
-              }
+    }
+
+    // get the person details object by the person id
+    private Person getPerByPerId(long personId) throws Exception {
+        for (CustomerCrd cstmr : sngltn.GetAllCustemers()) {
+            if (cstmr.getPerson().getId() == personId) {
+                return cstmr.getPerson();
+            }
         }
         return null;
-     } 
+    }
+
     /**
      * @param args the command line arguments
      */

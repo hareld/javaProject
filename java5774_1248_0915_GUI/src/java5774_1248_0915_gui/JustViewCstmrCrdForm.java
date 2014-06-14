@@ -3,154 +3,129 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package java5774_1248_0915_gui;
 
-import MyPackages.Claim;
-import MyPackages.Person;
-import MyPackages.Policy;
-import DataAccessObject.IBackend_DAO_List_impl;
+import DataAccessObject.Controller;
 import DataAccessObject.Singelton;
-import MyPackages.CustomerCrd;
-import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import static java.lang.Long.parseLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import Packages.Claim;
+import Packages.CustomerCrd;
+import Packages.Policy;
 
 /**
- *
  * @author dell
  */
 public class JustViewCstmrCrdForm extends javax.swing.JFrame {
+
     private static final long serialVersionUID = 1L;
     private long per_id;
-    
-    private static IBackend_DAO_List_impl sngltn = null;
+
+    private static Controller sngltn = null;
     private DefaultTableModel model1;
     private DefaultTableModel model2;
+
     static {
-                try 
-                {
-                sngltn=Singelton.getMySingelton();
-                } 
-                catch (Exception ex) 
-                {
-                    Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            };
-    /**
-     * Creates new form AddCstmrCrdForm
-     * @param person_id
-     * @throws java.lang.Exception
-     */
+        try {
+            sngltn = Singelton.getMySingelton();
+        } catch (Exception ex) {
+            Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    ;
+    
+    // Ctor
     public JustViewCstmrCrdForm(long person_id) throws Exception {
-        per_id=person_id;
-        CustomerCrd cstmr=sngltn.GetMyPersonCstmrCrd(per_id);
+        per_id = person_id;
+        CustomerCrd cstmr = sngltn.GetMyPersonCstmrCrd(per_id);
         initComponents();
-        model1 = (DefaultTableModel)jTablePolicyView.getModel();
-        model2 = (DefaultTableModel)jTableClaimView.getModel();
+        model1 = (DefaultTableModel) jTablePolicyView.getModel();
+        model2 = (DefaultTableModel) jTableClaimView.getModel();
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
-        
-        EnterPerName.setText(cstmr.getPer().getPerName().toString());
-        EnterPerId.setText(String.valueOf(cstmr.getPer().getPerId()));
-        EnterPerPhone.setText("0"+String.valueOf(cstmr.getPer().getPerPhon()));
-        EnterPerAddress.setText(cstmr.getPer().getPerAddress().toString());
-        try 
-        {
-            PerNameInActivityTab.setText("Person Name: "+
-                                          sngltn.GetMyPersonCstmrCrd(per_id).getPer().getPerName() + "\n"+
-                                          "Preson ID: "+
-                                          Long.toString(per_id)
-                                        );
-        } 
-        catch (Exception ex) 
-        {
+
+        EnterPerName.setText(cstmr.getPerson().getNamePerson().toString());
+        EnterPerId.setText(String.valueOf(cstmr.getPerson().getId()));
+        EnterPerPhone.setText("0" + String.valueOf(cstmr.getPerson().getPhonePerson()));
+        EnterPerAddress.setText(cstmr.getPerson().getAddressPerson().toString());
+        try {
+            PerNameInActivityTab.setText("Person Name: "
+                    + sngltn.GetMyPersonCstmrCrd(per_id).getPerson().getNamePerson() + "\n"
+                    + "Preson ID: "
+                    + Long.toString(per_id)
+            );
+        } catch (Exception ex) {
             Logger.getLogger(JustViewCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-         try 
-        {
-            for(Policy policy : sngltn.GetPerPolicies(cstmr.getPer()))
-            {
-                model1.addRow(new Object[] {String.valueOf(policy.getPolicyId()),String.valueOf(policy.getOpeningDate()),String.valueOf(policy.getRepresentativeName()),String.valueOf(policy.getPolicyType()),String.valueOf(policy.getInsuranceCompany()),policy.getPolicyRate()});
-            }                         
-        } 
-        catch (Exception ex) 
-        {
+        try {
+            for (Policy policy : sngltn.GetPerPolicies(cstmr.getPerson())) {
+                model1.addRow(new Object[]{String.valueOf(policy.getId()), String.valueOf(policy.getOpeningDate()), String.valueOf(policy.getRepresentativeName()), String.valueOf(policy.getPolicyType()), String.valueOf(policy.getInsuranceCompany()), policy.getPolicyRate()});
+            }
+        } catch (Exception ex) {
             Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-          try 
-        {
-            for(Claim claim : sngltn.GetPerClaims(cstmr.getPer()))
-            {
-                model2.addRow(new Object[] {String.valueOf(claim.getClaimId()),String.valueOf(claim.getRepresentativeName()),String.valueOf(claim.getInsuranceClaimStatus()),String.valueOf(claim.getEventType()),String.valueOf(claim.getEventTime()),String.valueOf(claim.getEventPlace())});
-            }                         
-        } 
-        catch (Exception ex) 
-        {
+
+        try {
+            for (Claim claim : sngltn.GetPerClaims(cstmr.getPerson())) {
+                model2.addRow(new Object[]{String.valueOf(claim.getId()), String.valueOf(claim.getRepresentativeName()), String.valueOf(claim.getInsuranceClaimStatus()), String.valueOf(claim.getEventType()), String.valueOf(claim.getEventTime()), String.valueOf(claim.getEventPlace())});
+            }
+        } catch (Exception ex) {
             Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
         }
-         
+
         jTablePolicyView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-               if (e.getClickCount() == 1) {
-                    JTable target = (JTable)e.getSource();
+                if (e.getClickCount() == 1) {
+                    JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
-                    
-                    JustViewPolicyForm ViewPolicyForm= null;
-                    try
-                    {
-                      ViewPolicyForm = new  JustViewPolicyForm(per_id,model1.getValueAt(row,0));
-                    }
-                    catch (Exception ex) 
-                    {
+
+                    JustViewPolicyForm ViewPolicyForm = null;
+                    try {
+                        ViewPolicyForm = new JustViewPolicyForm(per_id, model1.getValueAt(row, 0));
+                    } catch (Exception ex) {
                         Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    ViewPolicyForm .show();
-                  }
-             }
+                    ViewPolicyForm.show();
+                }
+            }
         });
-        
+
         jTableClaimView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-               if (e.getClickCount() == 1) {
-                    JTable target = (JTable)e.getSource();
+                if (e.getClickCount() == 1) {
+                    JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
-                    
-                    JustViewClaimForm ViewClaimForm= null;
-                    try
-                    {
-                      ViewClaimForm = new  JustViewClaimForm(per_id,model2.getValueAt(row,0));
-                    }
-                    catch (Exception ex) 
-                    {
+
+                    JustViewClaimForm ViewClaimForm = null;
+                    try {
+                        ViewClaimForm = new JustViewClaimForm(per_id, model2.getValueAt(row, 0));
+                    } catch (Exception ex) {
                         Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    ViewClaimForm .show();
-                  }
-             }
+                    ViewClaimForm.show();
+                }
+            }
         });
     }
-    
-     private void formWindowOpened(java.awt.event.WindowEvent evt) {                                  
-        int lebar = this.getWidth()/2;
-        int tinggi = this.getHeight()/2;
-        int x = (Toolkit.getDefaultToolkit().getScreenSize().width/2)-lebar;
-        int y = (Toolkit.getDefaultToolkit().getScreenSize().height/2)-tinggi;
+
+    // alignment the window
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {
+        int lebar = this.getWidth() / 2;
+        int tinggi = this.getHeight() / 2;
+        int x = (Toolkit.getDefaultToolkit().getScreenSize().width / 2) - lebar;
+        int y = (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - tinggi;
         this.setLocation(x, y);
     }
-     
-     
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -335,8 +310,7 @@ public class JustViewCstmrCrdForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-      
-    
+
     private void EnterPerIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EnterPerIdActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_EnterPerIdActionPerformed
@@ -344,8 +318,7 @@ public class JustViewCstmrCrdForm extends javax.swing.JFrame {
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
 
     }//GEN-LAST:event_formWindowClosing
-        
-       
+
     /**
      * @param args the command line arguments
      */
@@ -376,7 +349,7 @@ public class JustViewCstmrCrdForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-             //   new UpdateCstmrCrdForm().setVisible(true);
+                //   new UpdateCstmrCrdForm().setVisible(true);
             }
         });
     }

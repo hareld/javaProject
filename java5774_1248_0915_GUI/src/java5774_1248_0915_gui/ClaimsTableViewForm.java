@@ -3,223 +3,178 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package java5774_1248_0915_gui;
 
-import MyPackages.Activity;
-import MyPackages.Claim;
-import MyPackages.Person;
-import MyPackages.Policy;
-import DataAccessObject.IBackend_DAO_List_impl;
+import DataAccessObject.Controller;
 import DataAccessObject.Singelton;
-import MyPackages.CustomerCrd;
-import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import static java.lang.Long.parseLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import Packages.Activity;
+import Packages.Claim;
+import Packages.CustomerCrd;
 
 /**
- *
  * @author dell
  */
 public class ClaimsTableViewForm extends javax.swing.JFrame {
+
     private static final long serialVersionUID = 1L;
-    
-    private static IBackend_DAO_List_impl sngltn = null;
+
+    private static Controller sngltn = null;
     private DefaultTableModel model2;
+
     static {
-                try 
-                {
-                sngltn=Singelton.getMySingelton();
-                } 
-                catch (Exception ex) 
-                {
-                    Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            };
-    /**
-     * Creates new form AddCstmrCrdForm
-     * @param person_id
-     * @throws java.lang.Exception
-     */ 
+        try {
+            sngltn = Singelton.getMySingelton();
+        } catch (Exception ex) {
+            Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    ;
+    
+    // Ctor - veiw the claims in the table
     public ClaimsTableViewForm(String buttonText) throws Exception {
         initComponents();
-        model2 = (DefaultTableModel)jTableClaimView.getModel();
+        model2 = (DefaultTableModel) jTableClaimView.getModel();
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
-        
 
-        if (buttonText=="View All Claims")
-        {
-            JTextPaneClaimViewDescription.setText(buttonText);  
-            try 
-           {
-               model2.setRowCount(0);
-               for(Claim claim : sngltn.GetAllClaims())
-               {
-                   model2.addRow(new Object[] {getPerIdByClaimId(claim.getClaimId()),String.valueOf(claim.getClaimId()),String.valueOf(claim.getRepresentativeName()),String.valueOf(claim.getInsuranceClaimStatus()),String.valueOf(claim.getEventType()),String.valueOf(claim.getEventTime()),String.valueOf(claim.getEventPlace())});
-               }                         
-           } 
-           catch (Exception ex) 
-           {
-               Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-           }
+        if (buttonText == "View All Claims") {
+            JTextPaneClaimViewDescription.setText(buttonText);
+            try {
+                model2.setRowCount(0);
+                for (Claim claim : sngltn.GetAllClaims()) {
+                    model2.addRow(new Object[]{getPerIdByClaimId(claim.getId()), String.valueOf(claim.getId()), String.valueOf(claim.getRepresentativeName()), String.valueOf(claim.getInsuranceClaimStatus()), String.valueOf(claim.getEventType()), String.valueOf(claim.getEventTime()), String.valueOf(claim.getEventPlace())});
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else if (buttonText == "View All Open Claims") {
+            JTextPaneClaimViewDescription.setText(buttonText);
+            try {
+                model2.setRowCount(0);
+                for (Claim claim : sngltn.GetAllOpenClaims()) {
+                    model2.addRow(new Object[]{getPerIdByClaimId(claim.getId()), String.valueOf(claim.getId()), String.valueOf(claim.getRepresentativeName()), String.valueOf(claim.getInsuranceClaimStatus()), String.valueOf(claim.getEventType()), String.valueOf(claim.getEventTime()), String.valueOf(claim.getEventPlace())});
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        
-        else if (buttonText=="View All Open Claims")
-        {
-            JTextPaneClaimViewDescription.setText(buttonText);  
-            try 
-           {
-               model2.setRowCount(0);
-               for(Claim claim : sngltn.GetAllOpenClaims())
-               {
-                   model2.addRow(new Object[] {getPerIdByClaimId(claim.getClaimId()),String.valueOf(claim.getClaimId()),String.valueOf(claim.getRepresentativeName()),String.valueOf(claim.getInsuranceClaimStatus()),String.valueOf(claim.getEventType()),String.valueOf(claim.getEventTime()),String.valueOf(claim.getEventPlace())});
-               }                         
-           } 
-           catch (Exception ex) 
-           {
-               Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-           }
-        }
-        
-        jTableClaimView.addMouseListener(new MouseAdapter() {
+
+        jTableClaimView.addMouseListener(new MouseAdapter() { // mouse handler event
             public void mouseClicked(MouseEvent e) {
-               if (e.getClickCount() == 1) {
-                    JTable target = (JTable)e.getSource();
+                if (e.getClickCount() == 1) {
+                    JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
-                    
-                    JustViewClaimForm ViewClaimForm= null;
-                    try
-                    {
-                      ViewClaimForm = new  JustViewClaimForm((long) model2.getValueAt(row,0),model2.getValueAt(row,1));
-                    }
-                    catch (Exception ex) 
-                    {
+
+                    JustViewClaimForm ViewClaimForm = null;
+                    try {
+                        ViewClaimForm = new JustViewClaimForm((long) model2.getValueAt(row, 0), model2.getValueAt(row, 1));
+                    } catch (Exception ex) {
                         Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     ViewClaimForm.show();
-                  }
-             }
+                }
+            }
         });
     }
-    
-    public ClaimsTableViewForm(String buttonText , Claim.ClaimStat claimStat) throws Exception 
-    {
+
+    // Ctor - view the claims in table according the recieved claim status
+    public ClaimsTableViewForm(String buttonText, Claim.ClaimStat claimStat) throws Exception {
         initComponents();
-        model2 = (DefaultTableModel)jTableClaimView.getModel();
+        model2 = (DefaultTableModel) jTableClaimView.getModel();
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
 
-                
-        if ("View all Claim with this stauts".equals(buttonText))
-        {
-            JTextPaneClaimViewDescription.setText("View all Claims with claim status: "+claimStat.toString());  
-            try 
-           {
-               model2.setRowCount(0);
-               for(CustomerCrd ctmrCrd :sngltn.GetAllCustemers())
-               {    
-                    for(Claim claim : sngltn.GetMyStatusClaims(claimStat, ctmrCrd.getPer()))
-                    {
-                         model2.addRow(new Object[] {getPerIdByClaimId(claim.getClaimId()),String.valueOf(claim.getClaimId()),String.valueOf(claim.getRepresentativeName()),String.valueOf(claim.getInsuranceClaimStatus()),String.valueOf(claim.getEventType()),String.valueOf(claim.getEventTime()),String.valueOf(claim.getEventPlace())});
+        if ("View all Claim with this stauts".equals(buttonText)) {
+            JTextPaneClaimViewDescription.setText("View all Claims with claim status: " + claimStat.toString());
+            try {
+                model2.setRowCount(0);
+                for (CustomerCrd ctmrCrd : sngltn.GetAllCustemers()) {
+                    for (Claim claim : sngltn.GetMyStatusClaims(claimStat, ctmrCrd.getPerson())) {
+                        model2.addRow(new Object[]{getPerIdByClaimId(claim.getId()), String.valueOf(claim.getId()), String.valueOf(claim.getRepresentativeName()), String.valueOf(claim.getInsuranceClaimStatus()), String.valueOf(claim.getEventType()), String.valueOf(claim.getEventTime()), String.valueOf(claim.getEventPlace())});
                     }
-               }                         
-           } 
-           catch (Exception ex) 
-           {
-               Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-           }
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        
-        jTableClaimView.addMouseListener(new MouseAdapter() {
+
+        jTableClaimView.addMouseListener(new MouseAdapter() { // mouse handler event
             public void mouseClicked(MouseEvent e) {
-               if (e.getClickCount() == 1) {
-                    JTable target = (JTable)e.getSource();
+                if (e.getClickCount() == 1) {
+                    JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
-                    
-                    JustViewClaimForm ViewClaimForm= null;
-                    try
-                    {
-                      ViewClaimForm = new  JustViewClaimForm((long) model2.getValueAt(row,0),model2.getValueAt(row,1));
-                    }
-                    catch (Exception ex) 
-                    {
+
+                    JustViewClaimForm ViewClaimForm = null;
+                    try {
+                        ViewClaimForm = new JustViewClaimForm((long) model2.getValueAt(row, 0), model2.getValueAt(row, 1));
+                    } catch (Exception ex) {
                         Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     ViewClaimForm.show();
-                  }
-             }
+                }
+            }
         });
     }
-    
-    public ClaimsTableViewForm(String buttonText , Claim.EvntType eventType) throws Exception 
-    {
+
+    // Ctor - view the claims in table according the recieved event type
+    public ClaimsTableViewForm(String buttonText, Claim.EvntType eventType) throws Exception {
         initComponents();
-        model2 = (DefaultTableModel)jTableClaimView.getModel();
+        model2 = (DefaultTableModel) jTableClaimView.getModel();
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
 
-                
-        if ("View all Claim with this Event Type".equals(buttonText))
-        {
-            JTextPaneClaimViewDescription.setText("View all Claims with EventType: "+eventType.toString());  
-            try 
-           {
-               model2.setRowCount(0);
-               for(CustomerCrd ctmrCrd :sngltn.GetAllCustemers())
-               {    
-                    for(Claim claim : sngltn.GetMyEventClaims(eventType, ctmrCrd.getPer()))
-                    {
-                         model2.addRow(new Object[] {getPerIdByClaimId(claim.getClaimId()),String.valueOf(claim.getClaimId()),String.valueOf(claim.getRepresentativeName()),String.valueOf(claim.getInsuranceClaimStatus()),String.valueOf(claim.getEventType()),String.valueOf(claim.getEventTime()),String.valueOf(claim.getEventPlace())});
+        if ("View all Claim with this Event Type".equals(buttonText)) {
+            JTextPaneClaimViewDescription.setText("View all Claims with EventType: " + eventType.toString());
+            try {
+                model2.setRowCount(0);
+                for (CustomerCrd ctmrCrd : sngltn.GetAllCustemers()) {
+                    for (Claim claim : sngltn.GetMyEventClaims(eventType, ctmrCrd.getPerson())) {
+                        model2.addRow(new Object[]{getPerIdByClaimId(claim.getId()), String.valueOf(claim.getId()), String.valueOf(claim.getRepresentativeName()), String.valueOf(claim.getInsuranceClaimStatus()), String.valueOf(claim.getEventType()), String.valueOf(claim.getEventTime()), String.valueOf(claim.getEventPlace())});
                     }
-               }                         
-           } 
-           catch (Exception ex) 
-           {
-               Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-           }
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        
-        jTableClaimView.addMouseListener(new MouseAdapter() {
+
+        jTableClaimView.addMouseListener(new MouseAdapter() { // mouse handler event
             public void mouseClicked(MouseEvent e) {
-               if (e.getClickCount() == 1) {
-                    JTable target = (JTable)e.getSource();
+                if (e.getClickCount() == 1) {
+                    JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
-                    
-                    JustViewClaimForm ViewClaimForm= null;
-                    try
-                    {
-                      ViewClaimForm = new  JustViewClaimForm((long) model2.getValueAt(row,0),model2.getValueAt(row,1));
-                    }
-                    catch (Exception ex) 
-                    {
+
+                    JustViewClaimForm ViewClaimForm = null;
+                    try {
+                        ViewClaimForm = new JustViewClaimForm((long) model2.getValueAt(row, 0), model2.getValueAt(row, 1));
+                    } catch (Exception ex) {
                         Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                     }
                     ViewClaimForm.show();
-                  }
-             }
+                }
+            }
         });
     }
-    
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {                                  
-        int lebar = this.getWidth()/2;
-        int tinggi = this.getHeight()/2;
-        int x = (Toolkit.getDefaultToolkit().getScreenSize().width/2)-lebar;
-        int y = (Toolkit.getDefaultToolkit().getScreenSize().height/2)-tinggi;
+
+    // alignment the window
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {
+        int lebar = this.getWidth() / 2;
+        int tinggi = this.getHeight() / 2;
+        int x = (Toolkit.getDefaultToolkit().getScreenSize().width / 2) - lebar;
+        int y = (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - tinggi;
         this.setLocation(x, y);
     }
-     
-     
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -236,6 +191,7 @@ public class ClaimsTableViewForm extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         jTableClaimView = new javax.swing.JTable();
         jLabel7 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
 
         jMenu1.setText("jMenu1");
 
@@ -289,6 +245,9 @@ public class ClaimsTableViewForm extends javax.swing.JFrame {
         jLabel7.setText("Claims  Table:");
         SelectWhichNewActv.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 0, 160, -1));
 
+        jLabel1.setText("Select Claim  to View:");
+        SelectWhichNewActv.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 110, -1));
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -308,29 +267,27 @@ public class ClaimsTableViewForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-      
-    
+
+    // closimg the window
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
 
     }//GEN-LAST:event_formWindowClosing
-        
-     private long getPerIdByClaimId(long claimId) throws Exception
-     {
-      for (CustomerCrd cstmr :sngltn.GetAllCustemers())
-        {
-          for (Activity act:cstmr.getPerActivities())
-          {
-              if (act instanceof Claim)
-              {
-                  Claim claim=(Claim)act;
-                  if (claim.getClaimId()==claimId)
-                      return cstmr.getPer().getPerId();
-              }
-          }
+
+    // get the person id by the claim id of the customer card
+    private long getPerIdByClaimId(long claimId) throws Exception {
+        for (CustomerCrd cstmr : sngltn.GetAllCustemers()) {
+            for (Activity act : cstmr.getActivities()) {
+                if (act instanceof Claim) {
+                    Claim claim = (Claim) act;
+                    if (claim.getId() == claimId) {
+                        return cstmr.getPerson().getId();
+                    }
+                }
+            }
         }
         return 0;
-     }
-       
+    }
+
     /**
      * @param args the command line arguments
      */
@@ -361,7 +318,7 @@ public class ClaimsTableViewForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-             //   new UpdateCstmrCrdForm().setVisible(true);
+                //   new UpdateCstmrCrdForm().setVisible(true);
             }
         });
     }
@@ -369,6 +326,7 @@ public class ClaimsTableViewForm extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextPane JTextPaneClaimViewDescription;
     private javax.swing.JPanel SelectWhichNewActv;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JScrollPane jScrollPane1;

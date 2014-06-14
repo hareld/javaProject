@@ -3,15 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package java5774_1248_0915_gui;
 
-import MyPackages.Claim;
-import MyPackages.Person;
-import MyPackages.Policy;
-import DataAccessObject.IBackend_DAO_List_impl;
+import DataAccessObject.Controller;
 import DataAccessObject.Singelton;
-import MyPackages.CustomerCrd;
 import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
@@ -22,139 +17,121 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import Packages.Claim;
+import Packages.CustomerCrd;
+import Packages.Person;
+import Packages.Policy;
 
 /**
- *
  * @author dell
  */
 public class UpdateCstmrCrdForm extends javax.swing.JFrame {
+
     private static final long serialVersionUID = 1L;
     private long per_id;
-    
+
     private final Runnable UpdateCstmrCrdFormMyfunc;
-    
-    private static IBackend_DAO_List_impl sngltn = null;
+
+    private static Controller sngltn = null;
     private DefaultTableModel model1;
     private DefaultTableModel model2;
+
     static {
-                try 
-                {
-                sngltn=Singelton.getMySingelton();
-                } 
-                catch (Exception ex) 
-                {
-                    Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            };
-    /**
-     * Creates new form AddCstmrCrdForm
-     * @param person_id
-     * @throws java.lang.Exception
-     */
-    public UpdateCstmrCrdForm(long person_id,Runnable myFunc) throws Exception {
+        try {
+            sngltn = Singelton.getMySingelton();
+        } catch (Exception ex) {
+            Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    // Ctor
+    public UpdateCstmrCrdForm(long person_id, Runnable myFunc) throws Exception {
         UpdateCstmrCrdFormMyfunc = myFunc;
-        
-        per_id=person_id;
-        CustomerCrd cstmr=sngltn.GetMyPersonCstmrCrd(per_id);
+
+        per_id = person_id;
+        CustomerCrd cstmr = sngltn.GetMyPersonCstmrCrd(per_id);
         initComponents();
-        model1 = (DefaultTableModel)jTablePolicyView.getModel();
-        model2 = (DefaultTableModel)jTableClaimView.getModel();
+        model1 = (DefaultTableModel) jTablePolicyView.getModel();
+        model2 = (DefaultTableModel) jTableClaimView.getModel();
         java.awt.event.WindowEvent MyWindow = null;
         formWindowOpened(MyWindow);
-        
-        EnterPerName.setText(cstmr.getPer().getPerName().toString());
-        EnterPerId.setText(String.valueOf(cstmr.getPer().getPerId()));
-        EnterPerPhone.setText("0"+String.valueOf(cstmr.getPer().getPerPhon()));
-        EnterPerAddress.setText(cstmr.getPer().getPerAddress().toString());
-        try 
-        {
-            PerNameInActivityTab.setText("Person Name: "+
-                                          sngltn.GetMyPersonCstmrCrd(per_id).getPer().getPerName() + "\n"+
-                                          "Preson ID: "+
-                                          Long.toString(per_id)
-                                        );
-        } 
-        catch (Exception ex) 
-        {
+
+        EnterPerName.setText(cstmr.getPerson().getNamePerson().toString());
+        EnterPerId.setText(String.valueOf(cstmr.getPerson().getId()));
+        EnterPerPhone.setText("0" + String.valueOf(cstmr.getPerson().getPhonePerson()));
+        EnterPerAddress.setText(cstmr.getPerson().getAddressPerson().toString());
+        try {
+            PerNameInActivityTab.setText("Person Name: "
+                    + sngltn.GetMyPersonCstmrCrd(per_id).getPerson().getNamePerson() + "\n"
+                    + "Preson ID: "
+                    + Long.toString(per_id)
+            );
+        } catch (Exception ex) {
             Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-         try 
-        {
-            for(Policy policy : sngltn.GetPerPolicies(cstmr.getPer()))
-            {
-                model1.addRow(new Object[] {String.valueOf(policy.getPolicyId()),String.valueOf(policy.getOpeningDate()),String.valueOf(policy.getRepresentativeName()),String.valueOf(policy.getPolicyType()),String.valueOf(policy.getInsuranceCompany()),policy.getPolicyRate()});
-            }                         
-        } 
-        catch (Exception ex) 
-        {
+        try {
+            for (Policy policy : sngltn.GetPerPolicies(cstmr.getPerson())) {
+                model1.addRow(new Object[]{String.valueOf(policy.getId()), String.valueOf(policy.getOpeningDate()), String.valueOf(policy.getRepresentativeName()), String.valueOf(policy.getPolicyType()), String.valueOf(policy.getInsuranceCompany()), policy.getPolicyRate()});
+            }
+        } catch (Exception ex) {
             Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-          try 
-        {
-            for(Claim claim : sngltn.GetPerClaims(cstmr.getPer()))
-            {
-                model2.addRow(new Object[] {String.valueOf(claim.getClaimId()),String.valueOf(claim.getRepresentativeName()),String.valueOf(claim.getInsuranceClaimStatus()),String.valueOf(claim.getEventType()),String.valueOf(claim.getEventTime()),String.valueOf(claim.getEventPlace())});
-            }                         
-        } 
-        catch (Exception ex) 
-        {
+
+        try {
+            for (Claim claim : sngltn.GetPerClaims(cstmr.getPerson())) {
+                model2.addRow(new Object[]{String.valueOf(claim.getId()), String.valueOf(claim.getRepresentativeName()), String.valueOf(claim.getInsuranceClaimStatus()), String.valueOf(claim.getEventType()), String.valueOf(claim.getEventTime()), String.valueOf(claim.getEventPlace())});
+            }
+        } catch (Exception ex) {
             Logger.getLogger(AddCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
         }
-         
+
         jTablePolicyView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-               if (e.getClickCount() == 1) {
-                    JTable target = (JTable)e.getSource();
+                if (e.getClickCount() == 1) {
+                    JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
-                    
+
                     DeleteOrUpdateSelectForm deletOrUp = null;
-                    try
-                    {
-                      deletOrUp = new  DeleteOrUpdateSelectForm("p",per_id,jTablePolicyView.getValueAt(row,0),jTablePolicyView);
-                    }
-                    catch (Exception ex) 
-                    {
+                    try {
+                        deletOrUp = new DeleteOrUpdateSelectForm("p", per_id, jTablePolicyView.getValueAt(row, 0), jTablePolicyView);
+                    } catch (Exception ex) {
                         Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    deletOrUp .show();
-                  }
-             }
+                    deletOrUp.show();
+                }
+            }
         });
-        
+
         jTableClaimView.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-               if (e.getClickCount() == 1) {
-                    JTable target = (JTable)e.getSource();
+                if (e.getClickCount() == 1) {
+                    JTable target = (JTable) e.getSource();
                     int row = target.getSelectedRow();
                     int column = target.getSelectedColumn();
-                    
+
                     DeleteOrUpdateSelectForm deletOrUp = null;
-                    try
-                    {
-                      deletOrUp = new  DeleteOrUpdateSelectForm("c",per_id,jTableClaimView.getValueAt(row,0),jTableClaimView);
-                    }
-                    catch (Exception ex) 
-                    {
+                    try {
+                        deletOrUp = new DeleteOrUpdateSelectForm("c", per_id, jTableClaimView.getValueAt(row, 0), jTableClaimView);
+                    } catch (Exception ex) {
                         Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    deletOrUp .show();
-                  }
-             }
+                    deletOrUp.show();
+                }
+            }
         });
     }
-    
-     private void formWindowOpened(java.awt.event.WindowEvent evt) {                                  
-        int lebar = this.getWidth()/2;
-        int tinggi = this.getHeight()/2;
-        int x = (Toolkit.getDefaultToolkit().getScreenSize().width/2)-lebar;
-        int y = (Toolkit.getDefaultToolkit().getScreenSize().height/2)-tinggi;
+
+    // alignment
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {
+        int lebar = this.getWidth() / 2;
+        int tinggi = this.getHeight() / 2;
+        int x = (Toolkit.getDefaultToolkit().getScreenSize().width / 2) - lebar;
+        int y = (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - tinggi;
         this.setLocation(x, y);
     }
-     
-     
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -396,130 +373,110 @@ public class UpdateCstmrCrdForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-      
-    
+
+    // update the person
     private void buttonUpdatePersonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonUpdatePersonActionPerformed
         Person per = null;
         CustomerCrd cstmr = null;
-        try 
-        {
+        try {
             cstmr = sngltn.GetMyPersonCstmrCrd(per_id);
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        if (!CheckAllInputText(
-                                ThereIsText(EnterPerName.getText()),
-                                ThereIsText(EnterPerId.getText()) && OnlyNumbers(EnterPerId.getText()),
-                                ThereIsText(EnterPerPhone.getText()) && OnlyNumbers(EnterPerPhone.getText()),
-                                ThereIsText(EnterPerAddress.getText())
-                              )
-           )JOptionPane.showMessageDialog(null, "Insert valid values", "Error",JOptionPane.ERROR_MESSAGE);
 
-        else 
-        {
-           per=cstmr.getPer();
-           per.setPerName(EnterPerName.getText());
-           per.setPerPhon(parseLong(EnterPerPhone.getText()));
-           per.setPerAddress(EnterPerAddress.getText());
-           cstmr.setPer(per);
-           sngltn.UpdateCustomerCrd(cstmr);
-           JOptionPane.showMessageDialog(null, "Update Preson Successfully", "",JOptionPane.PLAIN_MESSAGE);
-            try 
-            {
-                PerNameInActivityTab.setText("Person Name: "+
-                                              sngltn.GetMyPersonCstmrCrd(per.getPerId()).getPer().getPerName() + "\n"+
-                                              "Preson ID: "+
-                                              Long.toString(per.getPerId())
-                                            );
-            } 
-            catch (Exception ex) 
-            {
+        if (!CheckAllInputText(
+                ThereIsText(EnterPerName.getText()),
+                ThereIsText(EnterPerId.getText()) && OnlyNumbers(EnterPerId.getText()),
+                ThereIsText(EnterPerPhone.getText()) && OnlyNumbers(EnterPerPhone.getText()),
+                ThereIsText(EnterPerAddress.getText())
+        )) {
+            JOptionPane.showMessageDialog(null, "Insert valid values", "Error", JOptionPane.ERROR_MESSAGE);
+        } else {
+            per = cstmr.getPerson();
+            per.setNamePerson(EnterPerName.getText());
+            per.setPhonePerson(parseLong(EnterPerPhone.getText()));
+            per.setAddressPerson(EnterPerAddress.getText());
+            cstmr.setPerson(per);
+            try {
+                sngltn.UpdateCustomerCrd(cstmr);
+            } catch (Exception ex) {
+                Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            JOptionPane.showMessageDialog(null, "Update Preson Successfully", "", JOptionPane.PLAIN_MESSAGE);
+            try {
+                PerNameInActivityTab.setText("Person Name: "
+                        + sngltn.GetMyPersonCstmrCrd(per.getId()).getPerson().getNamePerson() + "\n"
+                        + "Preson ID: "
+                        + Long.toString(per.getId())
+                );
+            } catch (Exception ex) {
                 Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }//GEN-LAST:event_buttonUpdatePersonActionPerformed
 
-    
-    
     @SuppressWarnings({"deprecation", "deprecation"})
     private void SelectActivTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SelectActivTypeActionPerformed
         //jComboBoxIdSelect
-        if (SelectActivType.getSelectedIndex()==0)
-        {
+        if (SelectActivType.getSelectedIndex() == 0) {
             AddPolicyForm AddPolicy = null;
-            try
-            {
-              AddPolicy = new  AddPolicyForm(per_id,jTablePolicyView,
-                                            new Runnable() {
-                                                      @Override public void run() {
-                                                                                    try 
-                                                                                    {
-                                                                                        EnableThisForm();
-                                                                                    }
-                                                                                    catch (Exception ex) 
-                                                                                    {
-                                                                                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-                                                                                    }
-                                                                                  }
-                                                    }
-                                            );
-            }
-            catch (Exception ex) 
-            {
+            try {
+                AddPolicy = new AddPolicyForm(per_id, jTablePolicyView,
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    EnableThisForm();
+                                } catch (Exception ex) {
+                                    Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            }
+                        }
+                );
+            } catch (Exception ex) {
                 Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
             }
             setEnabled(false);
             AddPolicy.show();
-        }
-        else if (SelectActivType.getSelectedIndex()==1)
-        {
-            
-            if(jTablePolicyView.getRowCount()==0)
-            {
-                JOptionPane.showMessageDialog(null, "Sorry, you can't open a new claim unless there is at least one policy.", "",JOptionPane.PLAIN_MESSAGE);
-            }
-            else
-                {
-                    AddClaimForm AddClaim=null;
-                    try
-                    {
-                    AddClaim = new  AddClaimForm(per_id,jTableClaimView,
-                                                 new Runnable() {
-                                                      @Override public void run() {
-                                                                                    try 
-                                                                                    {
-                                                                                        EnableThisForm();
-                                                                                    }
-                                                                                    catch (Exception ex) 
-                                                                                    {
-                                                                                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
-                                                                                    }
-                                                                                  }
-                                                    }
-                                                );
-                    }
-                    catch (Exception ex) 
-                    {
-                        Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    setEnabled(false);
-                    AddClaim.show();
+        } else if (SelectActivType.getSelectedIndex() == 1) {
+
+            if (jTablePolicyView.getRowCount() == 0) {
+                JOptionPane.showMessageDialog(null, "Sorry, you can't open a new claim unless there is at least one policy.", "", JOptionPane.PLAIN_MESSAGE);
+            } else {
+                AddClaimForm AddClaim = null;
+                try {
+                    AddClaim = new AddClaimForm(per_id, jTableClaimView,
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        EnableThisForm();
+                                    } catch (Exception ex) {
+                                        Logger.getLogger(MainForm.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                }
+                            }
+                    );
+                } catch (Exception ex) {
+                    Logger.getLogger(UpdateCstmrCrdForm.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                setEnabled(false);
+                AddClaim.show();
+            }
         }
     }//GEN-LAST:event_SelectActivTypeActionPerformed
 
-  
-    
+
     private void EnterPerIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EnterPerIdActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_EnterPerIdActionPerformed
 
+    // closing the window
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-           UpdateCstmrCrdFormMyfunc.run();
+        UpdateCstmrCrdFormMyfunc.run();
     }//GEN-LAST:event_formWindowClosing
 
+    // handle tooltip label
     private void person_name_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_name_cursor_in_handler
         if (EnterPerName.getText().equals("Enter Name")) {
             EnterPerName.setText(null);
@@ -528,14 +485,16 @@ public class UpdateCstmrCrdForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_person_name_cursor_in_handler
 
+    // handle tooltip label
     private void person_name_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_name_cursor_out_handler
-        if(EnterPerName.getText().length() < 1){
-           EnterPerName.setText("Enter Name");
-           EnterPerName.setFont(new java.awt.Font("Tahoma", 2, 11));
-           EnterPerName.setForeground(new java.awt.Color(153, 153, 153));
+        if (EnterPerName.getText().length() < 1) {
+            EnterPerName.setText("Enter Name");
+            EnterPerName.setFont(new java.awt.Font("Tahoma", 2, 11));
+            EnterPerName.setForeground(new java.awt.Color(153, 153, 153));
         }
     }//GEN-LAST:event_person_name_cursor_out_handler
 
+    // handle tooltip label
     private void person_phone_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_phone_cursor_in_handler
         if (EnterPerPhone.getText().equals("Enter Phone")) {
             EnterPerPhone.setText(null);
@@ -544,14 +503,16 @@ public class UpdateCstmrCrdForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_person_phone_cursor_in_handler
 
+    // handle tooltip label
     private void person_phone_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_phone_cursor_out_handler
-        if(EnterPerPhone.getText().length() < 1){
-           EnterPerPhone.setText("Enter Phone");
-           EnterPerPhone.setFont(new java.awt.Font("Tahoma", 2, 11));
-           EnterPerPhone.setForeground(new java.awt.Color(153, 153, 153));
+        if (EnterPerPhone.getText().length() < 1) {
+            EnterPerPhone.setText("Enter Phone");
+            EnterPerPhone.setFont(new java.awt.Font("Tahoma", 2, 11));
+            EnterPerPhone.setForeground(new java.awt.Color(153, 153, 153));
         }
     }//GEN-LAST:event_person_phone_cursor_out_handler
 
+    // handle tooltip label
     private void person_address_cursor_in_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_address_cursor_in_handler
         if (EnterPerAddress.getText().equals("Enter Address")) {
             EnterPerAddress.setText(null);
@@ -560,84 +521,80 @@ public class UpdateCstmrCrdForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_person_address_cursor_in_handler
 
+    // handle tooltip label
     private void person_address_cursor_out_handler(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_person_address_cursor_out_handler
-        if(EnterPerAddress.getText().length() < 1){
-           EnterPerAddress.setText("Enter Address");
-           EnterPerAddress.setFont(new java.awt.Font("Tahoma", 2, 11));
-           EnterPerAddress.setForeground(new java.awt.Color(153, 153, 153));
+        if (EnterPerAddress.getText().length() < 1) {
+            EnterPerAddress.setText("Enter Address");
+            EnterPerAddress.setFont(new java.awt.Font("Tahoma", 2, 11));
+            EnterPerAddress.setForeground(new java.awt.Color(153, 153, 153));
         }
     }//GEN-LAST:event_person_address_cursor_out_handler
 
     private void EnterPerNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EnterPerNameActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_EnterPerNameActionPerformed
-        
-        private static boolean OnlyNumbers(String str){ 
-            try{ 
-                long l = Long.parseLong(str); 
-            }
 
-            catch(NumberFormatException n)
-            { 
-                return false; 
-            } 
-            return true;
+    // check numeric
+    private static boolean OnlyNumbers(String str) {
+        try {
+            long l = Long.parseLong(str);
+        } catch (NumberFormatException n) {
+            return false;
         }
-        
-        private boolean ThereIsText(String str){ 
-            try{ 
-                int ln=str.length();
-                if ((ln == 0) || (str.equals("Enter Name")) || (str.equals("Enter Phone")) || (str.equals("Enter Address")))
-                    return false;
-            }
+        return true;
+    }
 
-            catch(NumberFormatException n){ 
-                return false; 
-            } 
-            return true;
+    // check if text exist
+    private boolean ThereIsText(String str) {
+        try {
+            int ln = str.length();
+            if ((ln == 0) || (str.equals("Enter Name")) || (str.equals("Enter Phone")) || (str.equals("Enter Address"))) {
+                return false;
+            }
+        } catch (NumberFormatException n) {
+            return false;
         }
-        
-         private boolean CheckAllInputText(boolean str1 ,boolean str2 , boolean str3, boolean str4 ){ 
-             boolean reslt=true;
-             if(!str1) 
-                {
-                 EnterPerName.setBackground(Color.red);
-                 reslt=false;
-                }
-             else
-                 EnterPerName.setBackground(Color.white);
-             
-             if(!str2) 
-                {
-                 EnterPerId.setBackground(Color.red);
-                 reslt=false;
-                }
-             else
-                 EnterPerId.setBackground(Color.white);
-             
-             if(!str3) 
-                {
-                 EnterPerPhone.setBackground(Color.red);
-                 reslt=false;
-                }
-             else
-                 EnterPerPhone.setBackground(Color.white);
-             
-             if(!str4) 
-                {
-                 EnterPerAddress.setBackground(Color.red);
-                 reslt=false;
-                }
-              else
-                 EnterPerAddress.setBackground(Color.white);
-             
-             return reslt;
-        } 
-         
-    private void EnableThisForm()throws Exception
-    {
+        return true;
+    }
+
+    // check if all input fields not empty
+    private boolean CheckAllInputText(boolean str1, boolean str2, boolean str3, boolean str4) {
+        boolean reslt = true;
+        if (!str1) {
+            EnterPerName.setBackground(Color.red);
+            reslt = false;
+        } else {
+            EnterPerName.setBackground(Color.white);
+        }
+
+        if (!str2) {
+            EnterPerId.setBackground(Color.red);
+            reslt = false;
+        } else {
+            EnterPerId.setBackground(Color.white);
+        }
+
+        if (!str3) {
+            EnterPerPhone.setBackground(Color.red);
+            reslt = false;
+        } else {
+            EnterPerPhone.setBackground(Color.white);
+        }
+
+        if (!str4) {
+            EnterPerAddress.setBackground(Color.red);
+            reslt = false;
+        } else {
+            EnterPerAddress.setBackground(Color.white);
+        }
+
+        return reslt;
+    }
+
+    private void EnableThisForm() throws Exception {
         setEnabled(true);
     }
+
     /**
      * @param args the command line arguments
      */
@@ -668,7 +625,7 @@ public class UpdateCstmrCrdForm extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-             //   new UpdateCstmrCrdForm().setVisible(true);
+                //   new UpdateCstmrCrdForm().setVisible(true);
             }
         });
     }
